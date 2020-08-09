@@ -11,6 +11,10 @@ import {createTripDayTemplate} from './view/trip-day.js';
 import {createPointEditTemplate} from './view/point-edit.js';
 import {createPointTemplate} from './view/point.js';
 
+import {generatePoint} from "./mock/point.js";
+
+const points = new Array(POINT_COUNT).fill().map(generatePoint);
+
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripPointsElement = document.querySelector(`.trip-events`);
 
@@ -41,8 +45,8 @@ render(tripDaysElement, createTripDayTemplate());
 
 const tripPointsList = tripDaysElement.querySelector(`.trip-events__list`);
 
-render(tripPointsList, createPointEditTemplate());
+render(tripPointsList, createPointEditTemplate(points[0]));
 
-for (let i = 1; i < POINT_COUNT; i++) {
-  render(tripPointsList, createPointTemplate());
+for (let i = 1; i < points.length; i++) {
+  render(tripPointsList, createPointTemplate(points[i]));
 }

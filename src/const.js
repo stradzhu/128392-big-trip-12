@@ -1,4 +1,6 @@
-const POINT_COUNT = 3;
+import {getRandomInteger} from "./utils.js";
+
+const POINT_COUNT = getRandomInteger(15, 25);
 
 const PlaceTemplate = {
   BEFOREBEGIN: `beforebegin`,
@@ -8,5 +10,3 @@ const PlaceTemplate = {
 };
 
 export {POINT_COUNT, PlaceTemplate};
-
-
