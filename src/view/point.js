@@ -1,3 +1,5 @@
+import {TimeInMilliseconds} from "../const";
+
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
     return ``;
@@ -15,18 +17,13 @@ const createOffersTemplate = (offers) => {
     </ul>`);
 };
 
-const createTimeTemplate = (time) => {
-  const {start, end} = time;
-
-  const ONE_MINUTE = 60000;
-  const ONE_HOUR = 3600000;
-  const ONE_DAY = 86400000;
+const createTimeTemplate = ({start, end}) => {
 
   const timeDiff = end - start;
   let humanTimeDiff = ``;
-  if (timeDiff < ONE_HOUR) {
-    humanTimeDiff = Math.round(timeDiff / ONE_MINUTE) + `M`;
-  } else if (timeDiff < ONE_DAY) {
+  if (timeDiff < TimeInMilliseconds.HOUR) {
+    humanTimeDiff = Math.round(timeDiff / TimeInMilliseconds.MINUTE) + `M`;
+  } else if (timeDiff < TimeInMilliseconds.DAY) {
     humanTimeDiff = new Date(timeDiff).toLocaleString(`en-US`, {day: `numeric`, month: `long`});
   } else {
     humanTimeDiff = new Date(timeDiff).toLocaleString(`en-US`, {day: `numeric`, month: `long`});
@@ -41,10 +38,8 @@ const createTimeTemplate = (time) => {
   );
 };
 
-export const createPointTemplate = (point) => {
-  const {waypoint, destination, price, time} = point;
-
-  return `<li class="trip-events__item">
+export const createPointTemplate = ({waypoint, destination, price, time}) => (
+  `<li class="trip-events__item">
     <div class="event">
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${waypoint.icon}" alt="${waypoint.title}">
@@ -65,5 +60,5 @@ export const createPointTemplate = (point) => {
         <span class="visually-hidden">Open event</span>
       </button>
     </div>
-  </li>`;
-};
+  </li>`
+);

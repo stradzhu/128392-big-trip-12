@@ -9,4 +9,10 @@ const PlaceTemplate = {
   AFTEREND: `afterend`
 };
 
-export {POINT_COUNT, PlaceTemplate};
+const TimeInMilliseconds = {
+  MINUTE: 60000,
+  HOUR: 3600000,
+  DAY: 86400000
+};
+
+export {POINT_COUNT, PlaceTemplate, TimeInMilliseconds};
