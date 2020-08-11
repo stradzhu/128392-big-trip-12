@@ -1,35 +1,5 @@
+import {CITIES, TimeInMilliseconds, WAYPOINTS, MAX_DAY_GAP} from '../const.js';
 import {getRandomInteger} from '../utils.js';
-import {TimeInMilliseconds} from '../const.js';
-
-const OFFERS_LIST = [
-  {title: `Order Uber`, price: 20},
-  {title: `Add luggage`, price: 50},
-  {title: `Switch to comfort`, price: 80},
-  {title: `Rent a car`, price: 200},
-  {title: `Add breakfast`, price: 50},
-  {title: `Book tickets`, price: 40},
-  {title: `Lunch in city`, price: 30}
-];
-
-const CITIES = [
-  `Amsterdam`,
-  `Budapest`,
-  `Copenhagen`,
-  `Dublin`,
-  `Helsinki`,
-  `Kiev`,
-  `London`,
-  `Moscow`,
-  `Oslo`,
-  `Paris`,
-  `Riga`,
-  `Stockholm`,
-  `Tallinn`,
-  `Vatican`,
-  `Vilnius`,
-  `Warsaw`,
-  `Zagreb`
-];
 
 const TEXT_LIST = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
@@ -45,76 +15,6 @@ const TEXT_LIST = [
   `In rutrum ac purus sit amet tempus.`
 ];
 
-const WAYPOINTS = [
-  {
-    title: `Taxi`,
-    place: `to`,
-    icon: `taxi.png`,
-    offers: generateOffers()
-  },
-  {
-    title: `Bus`,
-    place: `to`,
-    icon: `bus.png`,
-    offers: generateOffers()
-  },
-  {
-    title: `Train`,
-    place: `to`,
-    icon: `train.png`,
-    offers: generateOffers()
-  },
-  {
-    title: `Ship`,
-    place: `to`,
-    icon: `ship.png`,
-    offers: generateOffers()
-  },
-  {
-    title: `Transport`,
-    place: `to`,
-    icon: `transport.png`,
-    offers: generateOffers()
-  },
-  {
-    title: `Drive`,
-    place: `to`,
-    icon: `drive.png`,
-    offers: generateOffers()
-  },
-  {
-    title: `Flight`,
-    place: `to`,
-    icon: `flight.png`,
-    offers: generateOffers()
-  },
-  {
-    title: `Check-in`,
-    place: `in`,
-    icon: `check-in.png`,
-    offers: generateOffers()
-  },
-  {
-    title: `Sightseeing`,
-    place: `in`,
-    icon: `sightseeing.png`,
-    offers: generateOffers()
-  },
-  {
-    title: `Restaurant`,
-    place: `in`,
-    icon: `restaurant.png`,
-    offers: generateOffers()
-  }
-];
-
-function generateOffers() {
-  let offers = [];
-  for (let i = 0, max = getRandomInteger(0, OFFERS_LIST.length - 1); i < max; i++) {
-    offers.push(OFFERS_LIST[getRandomInteger(0, OFFERS_LIST.length - 1)]);
-  }
-  return [...new Set(offers)];
-}
 
 const generateDestination = () => {
   let photoList = [];
@@ -124,7 +24,7 @@ const generateDestination = () => {
 
   let description = ``;
   for (let i = 1, max = getRandomInteger(1, 5); i <= max; i++) {
-    description += description ? ` ` : `` + TEXT_LIST[getRandomInteger(0, TEXT_LIST.length - 1)];
+    description += (description ? ` ` : ``) + TEXT_LIST[getRandomInteger(0, TEXT_LIST.length - 1)];
   }
 
   return {
@@ -135,8 +35,8 @@ const generateDestination = () => {
 };
 
 const generatePoint = () => {
-  const start = new Date();
-  const end = new Date(getRandomInteger(start.getTime() + TimeInMilliseconds.MINUTE, start.getTime() + TimeInMilliseconds.DAY * 2));
+  const start = new Date(getRandomInteger(Date.now() - MAX_DAY_GAP * TimeInMilliseconds.DAY, Date.now() + MAX_DAY_GAP * TimeInMilliseconds.DAY));
+  const end = new Date(getRandomInteger(start.getTime() + TimeInMilliseconds.MINUTE, start.getTime() + TimeInMilliseconds.DAY * 1.2));
 
   return {
     waypoint: WAYPOINTS[getRandomInteger(0, WAYPOINTS.length - 1)],

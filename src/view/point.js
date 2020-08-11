@@ -1,4 +1,5 @@
-import {TimeInMilliseconds} from "../const";
+import {TimeInMilliseconds} from "../const.js";
+import {createTwoDigitNumber, createHumanTime} from "../utils.js";
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
@@ -18,21 +19,28 @@ const createOffersTemplate = (offers) => {
 };
 
 const createTimeTemplate = ({start, end}) => {
-
-  const timeDiff = end - start;
+  let timeDiff = end - start;
   let humanTimeDiff = ``;
-  if (timeDiff < TimeInMilliseconds.HOUR) {
-    humanTimeDiff = Math.round(timeDiff / TimeInMilliseconds.MINUTE) + `M`;
-  } else if (timeDiff < TimeInMilliseconds.DAY) {
-    humanTimeDiff = new Date(timeDiff).toLocaleString(`en-US`, {day: `numeric`, month: `long`});
-  } else {
-    humanTimeDiff = new Date(timeDiff).toLocaleString(`en-US`, {day: `numeric`, month: `long`});
+
+  let levelConvertDate = Boolean(Math.trunc(timeDiff / TimeInMilliseconds.DAY))
+    + Boolean(Math.trunc(timeDiff / TimeInMilliseconds.HOUR)) + 1;
+
+  switch (levelConvertDate) {
+    case 3:
+      humanTimeDiff = createTwoDigitNumber(Math.trunc(timeDiff / TimeInMilliseconds.DAY)) + `D `;
+      timeDiff = timeDiff % TimeInMilliseconds.DAY;
+    case 2: // eslint-disable-line no-fallthrough
+      humanTimeDiff += createTwoDigitNumber(Math.trunc(timeDiff / TimeInMilliseconds.HOUR)) + `H `;
+      timeDiff = timeDiff % TimeInMilliseconds.HOUR;
+    case 1: // eslint-disable-line no-fallthrough
+      humanTimeDiff += createTwoDigitNumber(Math.trunc(timeDiff / TimeInMilliseconds.MINUTE)) + `M`;
   }
+
   return (
     `<p class="event__time">
-      <time class="event__start-time" datetime="2019-03-18T10:30">10:30</time>
+      <time class="event__start-time" datetime="${start.toISOString()}">${createHumanTime(start)}</time>
       &mdash;
-      <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
+      <time class="event__end-time" datetime="${end.toISOString()}">${createHumanTime(end)}</time>
     </p>
     <p class="event__duration">${humanTimeDiff}</p>`
   );
