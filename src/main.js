@@ -15,9 +15,6 @@ import {generatePoint} from "./mock/point.js";
 
 const points = new Array(POINT_COUNT).fill().map(generatePoint);
 
-// daysPoints - создаем массив (на будущее), где все даты из points повторяются только один раз и отсортированы по возрастанию.
-// const daysPoints = [...new Set(points.map(({time})=> time.start.setHours(0, 0, 0, 0)))].sort().map((timestamp)=>new Date(timestamp));
-
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripPointsElement = document.querySelector(`.trip-events`);
 
