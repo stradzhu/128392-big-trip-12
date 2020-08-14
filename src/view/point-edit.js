@@ -1,5 +1,5 @@
 import {CITIES, WAYPOINTS} from "../const.js";
-import {createHumanTime, createHumanDate} from "../utils.js";
+import {createHumanTime, createHumanDate, createElement} from '../utils.js';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
@@ -132,4 +132,27 @@ const createPointEditTemplate = ({waypoint, destination, price, time}) => (
   </li>`
 );
 
-export {createPointEditTemplate};
+class PointEdit {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointEditTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default PointEdit;

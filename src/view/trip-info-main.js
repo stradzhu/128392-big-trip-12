@@ -1,3 +1,5 @@
+import {createElement} from '../utils.js';
+
 const createTripInfoMainTemplate = () => (
   `<div class="trip-info__main">
     <h1 class="trip-info__title">Amsterdam &mdash; Chamonix &mdash; Geneva</h1>
@@ -5,4 +7,26 @@ const createTripInfoMainTemplate = () => (
   </div>`
 );
 
-export {createTripInfoMainTemplate};
+class TripInfoMain {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripInfoMainTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default TripInfoMain;

@@ -1,5 +1,5 @@
-import {TimeInMilliseconds} from "../const.js";
-import {createTwoDigitNumber, createHumanTime} from "../utils.js";
+import {TimeInMilliseconds} from '../const.js';
+import {createTwoDigitNumber, createHumanTime, createElement} from '../utils.js';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
@@ -46,7 +46,7 @@ const createTimeTemplate = ({start, end}) => {
   );
 };
 
-const createPointTemplate = ({waypoint, destination, price, time}) => (
+const createPointItemTemplate = ({waypoint, destination, price, time}) => (
   `<li class="trip-events__item">
     <div class="event">
       <div class="event__type">
@@ -71,4 +71,27 @@ const createPointTemplate = ({waypoint, destination, price, time}) => (
   </li>`
 );
 
-export {createPointTemplate};
+class PointItem {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointItemTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default PointItem;
