@@ -2,6 +2,8 @@ import {getRandomInteger} from "./utils.js";
 
 const POINT_COUNT = getRandomInteger(15, 25);
 
+const ESCAPE_KEY_CODE = 27;
+
 const CITIES = [
   `Amsterdam`,
   `Budapest`,
@@ -132,4 +134,4 @@ function generateOffers() {
   return offers;
 }
 
-export {POINT_COUNT, CITIES, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds};
+export {POINT_COUNT, ESCAPE_KEY_CODE, CITIES, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds};
