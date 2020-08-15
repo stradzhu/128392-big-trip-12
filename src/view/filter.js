@@ -1,28 +1,31 @@
-import {createElement} from '../utils.js';
+import {createElement, makeForAttr} from '../utils.js';
 
-const createFilterItemTemplate = (filter) => {
-  let filterForHTML = filter.replace(/\s/g, `-`).toLowerCase();
-  return (
-    `<div class="trip-filters__filter">
-      <input checked
-        class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter"
-        id="filter-${filterForHTML}"
-        value="everything" >
-      <label class="trip-filters__filter-label" for="filter-${filterForHTML}">${filter}</label>
-    </div>`
-  );
-};
+const FILTER_LIST = [
+  `Everything`,
+  `Future`,
+  `Past`
+];
 
-const createFilterTemplate = (filterItems) => (
+const createFilterItemTemplate = (filter, isChecked) => (
+  `<div class="trip-filters__filter">
+    <input ${isChecked ? `checked` : ``}
+      class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter"
+      id="filter-${makeForAttr(filter)}"
+      value="${makeForAttr(filter)}">
+    <label class="trip-filters__filter-label" for="filter-${makeForAttr(filter)}">${filter}</label>
+  </div>`
+);
+
+
+const createFilterTemplate = () => (
   `<form class="trip-filters" action="#" method="get">
-    ${filterItems.map((filter)=>createFilterItemTemplate(filter)).join(``)}
+    ${FILTER_LIST.map((filter, index)=>createFilterItemTemplate(filter, index === 0)).join(``)}
     <button class="visually-hidden" type="submit">Accept filter</button>
   </form>`
 );
 
 class Filter {
-  constructor(filterItems) {
-    this._filterItems = filterItems;
+  constructor() {
     this._element = null;
   }
 

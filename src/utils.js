@@ -43,4 +43,6 @@ const replaceElement = (parentNode, newChild, oldChild) => {
   parentNode.replaceChild(newChild, oldChild);
 };
 
-export {getRandomInteger, createTwoDigitNumber, createHumanTime, createHumanDate, render, renderTemplate, createElement, replaceElement};
+const makeForAttr = (string) => string.replace(/\s/g, `-`).toLowerCase();
+
+export {getRandomInteger, createTwoDigitNumber, createHumanTime, createHumanDate, render, renderTemplate, createElement, replaceElement, makeForAttr};

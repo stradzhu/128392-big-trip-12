@@ -1,5 +1,5 @@
 import {CITIES, WAYPOINTS} from "../const.js";
-import {createHumanTime, createHumanDate, createElement} from '../utils.js';
+import {createHumanTime, createHumanDate, createElement, makeForAttr} from '../utils.js';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
@@ -10,20 +10,15 @@ const createOffersTemplate = (offers) => {
     `<section class="event__section event__section--offers">
       <h3 class="event__section-title event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-    ${offers.map(({title, price, isChecked})=>{
-      let titleForHTML = title.replace(/\s/g, `-`).toLowerCase();
-      return (
-        `<div class="event__offer-selector">
+      ${offers.map(({title, price, isChecked})=>(`<div class="event__offer-selector">
           <input class="event__offer-checkbox visually-hidden" ${isChecked ? `checked` : ``}
-            id="event-offer-${titleForHTML}" type="checkbox" name="event-offer-${titleForHTML}">
-          <label class="event__offer-label" for="event-offer-${titleForHTML}">
+            id="event-offer-${makeForAttr(title)}" type="checkbox" name="event-offer-${makeForAttr(title)}">
+          <label class="event__offer-label" for="event-offer-${makeForAttr(title)}">
             <span class="event__offer-title">${title}</span>
             &plus;
             &euro;&nbsp;<span class="event__offer-price">${price}</span>
           </label>
-        </div>`
-      );
-    }).join(``)}
+        </div>`)).join(``)}
       </div>
     </section>`);
 };
@@ -35,7 +30,7 @@ const createPointEditTemplate = ({waypoint, destination, price, time}) => (
         <div class="event__type-wrapper">
           <label class="event__type event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${waypoint.icon}" alt="${waypoint.title}">
           </label>
           <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox">
 

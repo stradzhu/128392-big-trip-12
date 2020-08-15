@@ -15,7 +15,6 @@ import PointItemView from './view/point-item.js';
 import NoPointView from './view/no-point.js';
 
 import {generatePoint} from './mock/point.js';
-import {generateFilter} from './mock/filter.js';
 
 const points = new Array(POINT_COUNT).fill().map(generatePoint);
 
@@ -71,7 +70,7 @@ const renderBoard = (tripPointsElement, tripPoints) => {
   render(tripInfoElement, new TripInfoCostView(points).getElement());
 
   render(switchMenuElement, new SwitchMenuView().getElement(), PlaceTemplate.AFTEREND);
-  render(filterElement, new FilterView(generateFilter()).getElement(), PlaceTemplate.AFTEREND);
+  render(filterElement, new FilterView().getElement(), PlaceTemplate.AFTEREND);
   render(sortElement, new SortView().getElement(), PlaceTemplate.AFTEREND);
 
   const tripDaysElement = new TripDaysView().getElement();

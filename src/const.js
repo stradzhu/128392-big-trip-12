@@ -115,23 +115,15 @@ const TimeInMilliseconds = {
 };
 
 function generateOffers() {
-  let offers = [];
   let alreadyAdded = [];
   let randomInteger;
-  for (let i = 0, max = getRandomInteger(0, OFFERS_LIST.length - 1); i < max; i++) {
-    // наверное, в первый раз в жизни, я использую цикл с постусловием, когда он реально нужен. Круть :)
+  return new Array(getRandomInteger(0, OFFERS_LIST.length)).fill().map(()=>{
     do {
       randomInteger = getRandomInteger(0, OFFERS_LIST.length - 1);
     } while (alreadyAdded.includes(randomInteger));
     alreadyAdded.push(randomInteger);
-    offers.push(OFFERS_LIST[randomInteger]);
-  }
-
-  offers.forEach((element, index, array)=>{
-    array[index].isChecked = Boolean(getRandomInteger(0, 1));
+    return Object.assign({}, OFFERS_LIST[randomInteger], {isChecked: Boolean(getRandomInteger(0, 1))});
   });
-
-  return offers;
 }
 
 export {POINT_COUNT, ESCAPE_KEY_CODE, CITIES, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds};
