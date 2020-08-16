@@ -41,61 +41,61 @@ const WAYPOINTS = [
     title: `Taxi`,
     place: `to`,
     icon: `taxi.png`,
-    offers: generateOffers()
+    offers: generateUniqueOffers()
   },
   {
     title: `Bus`,
     place: `to`,
     icon: `bus.png`,
-    offers: generateOffers()
+    offers: generateUniqueOffers()
   },
   {
     title: `Train`,
     place: `to`,
     icon: `train.png`,
-    offers: generateOffers()
+    offers: generateUniqueOffers()
   },
   {
     title: `Ship`,
     place: `to`,
     icon: `ship.png`,
-    offers: generateOffers()
+    offers: generateUniqueOffers()
   },
   {
     title: `Transport`,
     place: `to`,
     icon: `transport.png`,
-    offers: generateOffers()
+    offers: generateUniqueOffers()
   },
   {
     title: `Drive`,
     place: `to`,
     icon: `drive.png`,
-    offers: generateOffers()
+    offers: generateUniqueOffers()
   },
   {
     title: `Flight`,
     place: `to`,
     icon: `flight.png`,
-    offers: generateOffers()
+    offers: generateUniqueOffers()
   },
   {
     title: `Check-in`,
     place: `in`,
     icon: `check-in.png`,
-    offers: generateOffers()
+    offers: generateUniqueOffers()
   },
   {
     title: `Sightseeing`,
     place: `in`,
     icon: `sightseeing.png`,
-    offers: generateOffers()
+    offers: generateUniqueOffers()
   },
   {
     title: `Restaurant`,
     place: `in`,
     icon: `restaurant.png`,
-    offers: generateOffers()
+    offers: generateUniqueOffers()
   }
 ];
 
@@ -114,7 +114,7 @@ const TimeInMilliseconds = {
   DAY: 86400000
 };
 
-function generateOffers() {
+function generateUniqueOffers() {
   let alreadyAdded = [];
   let randomInteger;
   return new Array(getRandomInteger(0, OFFERS_LIST.length)).fill().map(()=>{
