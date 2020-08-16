@@ -1,4 +1,4 @@
-import {createElement, makeForAttr} from '../utils.js';
+import {createElement, makeForAttribute} from '../utils.js';
 
 const FILTER_LIST = [
   `Everything`,
@@ -10,9 +10,9 @@ const createFilterItemTemplate = (filter, isChecked) => (
   `<div class="trip-filters__filter">
     <input ${isChecked ? `checked` : ``}
       class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter"
-      id="filter-${makeForAttr(filter)}"
-      value="${makeForAttr(filter)}">
-    <label class="trip-filters__filter-label" for="filter-${makeForAttr(filter)}">${filter}</label>
+      id="filter-${makeForAttribute(filter)}"
+      value="${makeForAttribute(filter)}">
+    <label class="trip-filters__filter-label" for="filter-${makeForAttribute(filter)}">${filter}</label>
   </div>`
 );
 

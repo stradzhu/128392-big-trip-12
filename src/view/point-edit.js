@@ -1,5 +1,5 @@
 import {CITIES, WAYPOINTS} from "../const.js";
-import {createHumanTime, createHumanDate, createElement, makeForAttr} from '../utils.js';
+import {createHumanTime, createHumanDate, createElement, makeForAttribute} from '../utils.js';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
@@ -12,8 +12,8 @@ const createOffersTemplate = (offers) => {
       <div class="event__available-offers">
       ${offers.map(({title, price, isChecked})=>(`<div class="event__offer-selector">
           <input class="event__offer-checkbox visually-hidden" ${isChecked ? `checked` : ``}
-            id="event-offer-${makeForAttr(title)}" type="checkbox" name="event-offer-${makeForAttr(title)}">
-          <label class="event__offer-label" for="event-offer-${makeForAttr(title)}">
+            id="event-offer-${makeForAttribute(title)}" type="checkbox" name="event-offer-${makeForAttribute(title)}">
+          <label class="event__offer-label" for="event-offer-${makeForAttribute(title)}">
             <span class="event__offer-title">${title}</span>
             &plus;
             &euro;&nbsp;<span class="event__offer-price">${price}</span>
