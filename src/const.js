@@ -2,6 +2,8 @@ import {getRandomInteger} from "./utils.js";
 
 const POINT_COUNT = getRandomInteger(15, 25);
 
+const ESCAPE_KEY_CODE = 27;
+
 const CITIES = [
   `Amsterdam`,
   `Budapest`,
@@ -113,11 +115,15 @@ const TimeInMilliseconds = {
 };
 
 function generateOffers() {
-  let offers = [];
-  for (let i = 0, max = getRandomInteger(0, OFFERS_LIST.length - 1); i < max; i++) {
-    offers.push(OFFERS_LIST[getRandomInteger(0, OFFERS_LIST.length - 1)]);
-  }
-  return [...new Set(offers)];
+  let alreadyAdded = [];
+  let randomInteger;
+  return new Array(getRandomInteger(0, OFFERS_LIST.length)).fill().map(()=>{
+    do {
+      randomInteger = getRandomInteger(0, OFFERS_LIST.length - 1);
+    } while (alreadyAdded.includes(randomInteger));
+    alreadyAdded.push(randomInteger);
+    return Object.assign({}, OFFERS_LIST[randomInteger], {isChecked: Boolean(getRandomInteger(0, 1))});
+  });
 }
 
-export {POINT_COUNT, CITIES, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds};
+export {POINT_COUNT, ESCAPE_KEY_CODE, CITIES, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds};

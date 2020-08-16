@@ -1,5 +1,5 @@
-import {TimeInMilliseconds} from "../const.js";
-import {createTwoDigitNumber, createHumanTime} from "../utils.js";
+import {TimeInMilliseconds} from '../const.js';
+import {createTwoDigitNumber, createHumanTime, createElement} from '../utils.js';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
@@ -8,7 +8,7 @@ const createOffersTemplate = (offers) => {
 
   return (`<h4 class="visually-hidden">Offers:</h4>
   <ul class="event__selected-offers">
-    ${offers.map(({title, price}, index)=>(
+    ${offers.filter(({isChecked})=>isChecked).map(({title, price}, index)=>(
       `<li class="event__offer" ${index > 2 ? `style="display: none"` : ``}>
         <span class="event__offer-title">${title}</span>
         &plus;
@@ -46,7 +46,7 @@ const createTimeTemplate = ({start, end}) => {
   );
 };
 
-export const createPointTemplate = ({waypoint, destination, price, time}) => (
+const createPointItemTemplate = ({waypoint, destination, price, time}) => (
   `<li class="trip-events__item">
     <div class="event">
       <div class="event__type">
@@ -70,3 +70,28 @@ export const createPointTemplate = ({waypoint, destination, price, time}) => (
     </div>
   </li>`
 );
+
+class PointItem {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointItemTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default PointItem;

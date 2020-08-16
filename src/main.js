@@ -1,55 +1,93 @@
-import {POINT_COUNT, PlaceTemplate} from "./const.js";
+import {POINT_COUNT, ESCAPE_KEY_CODE, PlaceTemplate} from './const.js';
+import {render, replaceElement} from './utils.js';
 
-import {createTripInfoTemplate} from './view/trip-info.js';
-import {createTripInfoMainTemplate} from './view/trip-info-main.js';
-import {createTripInfoCostTemplate} from './view/trip-info-cost.js';
-import {createSwitchMenuTemplate} from './view/switch-menu.js';
-import {createFilterTemplate} from './view/filter.js';
-import {createSortTemplate} from './view/sort.js';
-import {createTripDaysTemplate} from './view/trip-days.js';
-import {createTripDayTemplate} from './view/trip-day.js';
-import {createPointEditTemplate} from './view/point-edit.js';
-import {createPointTemplate} from './view/point.js';
+import TripInfoView from './view/trip-info.js';
+import TripInfoMainView from './view/trip-info-main.js';
+import TripInfoCostView from './view/trip-info-cost.js';
+import SwitchMenuView from './view/switch-menu.js';
+import FilterView from './view/filter.js';
+import SortView from './view/sort.js';
+import TripDaysView from './view/trip-days.js';
+import TripDayView from './view/trip-day.js';
+import PointContainerView from './view/point-container.js';
+import PointEditView from './view/point-edit.js';
+import PointItemView from './view/point-item.js';
+import NoPointView from './view/no-point.js';
 
-import {generatePoint} from "./mock/point.js";
+import {generatePoint} from './mock/point.js';
 
 const points = new Array(POINT_COUNT).fill().map(generatePoint);
 
-// daysPoints - создаем массив (на будущее), где все даты из points повторяются только один раз и отсортированы по возрастанию.
-// const daysPoints = [...new Set(points.map(({time})=> time.start.setHours(0, 0, 0, 0)))].sort().map((timestamp)=>new Date(timestamp));
+const renderPoint = (pointListElement, point) => {
+  const pointItemElement = new PointItemView(point).getElement();
+  const pointEditElement = new PointEditView(point).getElement();
 
-const tripMainElement = document.querySelector(`.trip-main`);
-const tripPointsElement = document.querySelector(`.trip-events`);
+  const onEscKeyDown = (evt) => {
+    if (evt.keyCode === ESCAPE_KEY_CODE) {
+      evt.preventDefault();
+      replaceElement(pointListElement, pointItemElement, pointEditElement);
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
 
-const switchMenuElement = tripMainElement.querySelector(`.trip-controls > h2:first-child`);
-const filterElement = tripMainElement.querySelector(`.trip-controls > h2:last-child`);
+  pointItemElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceElement(pointListElement, pointEditElement, pointItemElement);
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
 
-const softElement = tripPointsElement.querySelector(`:scope > h2:first-child`);
+  pointEditElement.querySelector(`form`).addEventListener(`submit`, (evt) => {
+    evt.preventDefault();
+    replaceElement(pointListElement, pointItemElement, pointEditElement);
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
 
-const render = (container, template, place = PlaceTemplate.BEFOREEND) => {
-  container.insertAdjacentHTML(place, template);
+  pointEditElement.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceElement(pointListElement, pointItemElement, pointEditElement);
+    document.removeEventListener(`keydown`, onEscKeyDown);
+  });
+
+  render(pointListElement, pointItemElement);
 };
 
-render(tripMainElement, createTripInfoTemplate(), PlaceTemplate.AFTERBEGIN);
+const renderBoard = (tripPointsElement, tripPoints) => {
 
-const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
+  if (!tripPoints.length) {
+    render(tripPointsElement, new NoPointView().getElement());
+    return;
+  }
 
-render(tripInfoElement, createTripInfoMainTemplate());
-render(tripInfoElement, createTripInfoCostTemplate(points));
+  const tripMainElement = document.querySelector(`.trip-main`);
+  const switchMenuElement = tripMainElement.querySelector(`.trip-controls > h2:first-child`);
+  const filterElement = tripMainElement.querySelector(`.trip-controls > h2:last-child`);
 
-render(switchMenuElement, createSwitchMenuTemplate(), PlaceTemplate.AFTEREND);
-render(filterElement, createFilterTemplate(), PlaceTemplate.AFTEREND);
-render(softElement, createSortTemplate(), PlaceTemplate.AFTEREND);
-render(tripPointsElement, createTripDaysTemplate());
+  const sortElement = tripPointsElement.querySelector(`:scope > h2:first-child`);
 
-const tripDaysElement = tripPointsElement.querySelector(`.trip-days`);
+  const tripInfoElement = new TripInfoView().getElement();
 
-render(tripDaysElement, createTripDayTemplate());
+  render(tripMainElement, tripInfoElement, PlaceTemplate.AFTERBEGIN);
 
-const tripPointsList = tripDaysElement.querySelector(`.trip-events__list`);
+  render(tripInfoElement, new TripInfoMainView().getElement());
+  render(tripInfoElement, new TripInfoCostView(points).getElement());
 
-render(tripPointsList, createPointEditTemplate(points[0]));
+  render(switchMenuElement, new SwitchMenuView().getElement(), PlaceTemplate.AFTEREND);
+  render(filterElement, new FilterView().getElement(), PlaceTemplate.AFTEREND);
+  render(sortElement, new SortView().getElement(), PlaceTemplate.AFTEREND);
 
-for (let i = 1; i < points.length; i++) {
-  render(tripPointsList, createPointTemplate(points[i]));
-}
+  const tripDaysElement = new TripDaysView().getElement();
+
+  render(tripPointsElement, tripDaysElement);
+
+  const tripDayElement = new TripDayView().getElement();
+
+  render(tripDaysElement, tripDayElement);
+
+  const pointContainerElement = new PointContainerView().getElement();
+
+  render(tripDayElement, pointContainerElement);
+
+  for (let i = 0; i < tripPoints.length; i++) {
+    renderPoint(pointContainerElement, tripPoints[i]);
+  }
+};
+
+renderBoard(document.querySelector(`.trip-events`), points);
