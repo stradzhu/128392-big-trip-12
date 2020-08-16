@@ -1,5 +1,4 @@
 import {POINT_COUNT, ESCAPE_KEY_CODE, PlaceTemplate} from './const.js';
-
 import {render, replaceElement} from './utils.js';
 
 import TripInfoView from './view/trip-info.js';
