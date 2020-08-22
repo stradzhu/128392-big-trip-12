@@ -1,5 +1,6 @@
 import {CITIES, WAYPOINTS} from "../const.js";
-import {createHumanTime, createHumanDate, createElement, makeForAttribute} from '../utils.js';
+import {createHumanTime, createHumanDate, makeForAttribute} from '../utils/render.js';
+import AbstractView from './abstract.js';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
@@ -127,26 +128,36 @@ const createPointEditTemplate = ({waypoint, destination, price, time}) => (
   </li>`
 );
 
-class PointEdit {
+class PointEdit extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formCloseHandler = this._formCloseHandler.bind(this);
   }
 
   getTemplate() {
     return createPointEditTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`form`).addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  _formCloseHandler(evt) {
+    evt.preventDefault();
+    this._callback.formClose();
+  }
+
+  setFormCloseHandler(callback) {
+    this._callback.formClose = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._formCloseHandler);
   }
 }
 

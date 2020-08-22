@@ -1,4 +1,4 @@
-import {createElement} from '../utils.js';
+import AbstractView from './abstract.js';
 
 const createTripDayTemplate = () => (
   `<li class="trip-days__item day">
@@ -9,25 +9,9 @@ const createTripDayTemplate = () => (
   </li>`
 );
 
-class TripDay {
-  constructor() {
-    this._element = null;
-  }
-
+class TripDay extends AbstractView {
   getTemplate() {
     return createTripDayTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

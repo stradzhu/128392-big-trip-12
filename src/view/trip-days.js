@@ -1,26 +1,10 @@
-import {createElement} from '../utils.js';
+import AbstractView from './abstract.js';
 
 const createTripDaysTemplate = () => `<ul class="trip-days"></ul>`;
 
-class TripDays {
-  constructor() {
-    this._element = null;
-  }
-
+class TripDays extends AbstractView {
   getTemplate() {
     return createTripDaysTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

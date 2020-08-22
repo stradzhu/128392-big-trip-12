@@ -1,4 +1,5 @@
-import {createElement, makeForAttribute} from '../utils.js';
+import {makeForAttribute} from '../utils/render.js';
+import AbstractView from './abstract.js';
 
 const FILTER_LIST = [
   `Everything`,
@@ -16,7 +17,6 @@ const createFilterItemTemplate = (filter, isChecked) => (
   </div>`
 );
 
-
 const createFilterTemplate = () => (
   `<form class="trip-filters" action="#" method="get">
     ${FILTER_LIST.map((filter, index)=>createFilterItemTemplate(filter, index === 0)).join(``)}
@@ -24,25 +24,9 @@ const createFilterTemplate = () => (
   </form>`
 );
 
-class Filter {
-  constructor() {
-    this._element = null;
-  }
-
+class Filter extends AbstractView {
   getTemplate() {
-    return createFilterTemplate(this._filterItems);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    return createFilterTemplate();
   }
 }
 
