@@ -1,5 +1,5 @@
 import {CITIES, TimeInMilliseconds, WAYPOINTS, MAX_DAY_GAP} from '../const.js';
-import {getRandomInteger} from '../utils.js';
+import {getRandomInteger} from '../utils/common.js';
 
 const TEXT_LIST = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
