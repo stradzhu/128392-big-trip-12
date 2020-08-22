@@ -15,47 +15,40 @@ import PointEditView from '../view/point-edit.js';
 import NoPointView from '../view/no-point.js';
 
 class Trip {
-  constructor(tripContainer) {
-    this._tripContainer = tripContainer;
+  constructor({containerElement, tripMainElement, switchMenuElement, filterElement, sortElement}) {
+    this._containerElement = containerElement;
+    this._tripMainElement = tripMainElement;
+    this._switchMenuElement = switchMenuElement;
+    this._filterElement = filterElement;
+    this._sortElement = sortElement;
+
+    this._tripInfoComponent = new TripInfoView();
+    this._tripDaysComponent = new TripDaysView();
+    this._tripDayComponent = new TripDayView();
+    this._pointContainerComponent = new PointContainerView();
   }
 
-  init(tripPoints) {
-    if (!tripPoints.length) {
+  init(points) {
+    if (!points.length) {
       this._renderNoPoint();
       return;
     }
 
-    this._tripMainElement = document.querySelector(`.trip-main`);
-    this._switchMenuElement = this._tripMainElement.querySelector(`.trip-controls > h2:first-child`);
-    this._filterElement = this._tripMainElement.querySelector(`.trip-controls > h2:last-child`);
-    this._sortElement = this._tripContainer.querySelector(`:scope > h2:first-child`);
-
-    this._tripInfoComponent = new TripInfoView();
-
     render(this._tripMainElement, this._tripInfoComponent, PlaceTemplate.AFTERBEGIN);
 
     render(this._tripInfoComponent, new TripInfoMainView());
-    render(this._tripInfoComponent, new TripInfoCostView(tripPoints));
+    render(this._tripInfoComponent, new TripInfoCostView(points));
 
     render(this._switchMenuElement, new SwitchTripView(), PlaceTemplate.AFTEREND);
     render(this._filterElement, new FilterView(), PlaceTemplate.AFTEREND);
     render(this._sortElement, new SortView(), PlaceTemplate.AFTEREND);
 
-    this._tripDaysComponent = new TripDaysView();
-
-    render(this._tripContainer, this._tripDaysComponent);
-
-    this._tripDayComponent = new TripDayView();
+    render(this._containerElement, this._tripDaysComponent);
 
     render(this._tripDaysComponent, this._tripDayComponent);
-
-    this._pointContainerComponent = new PointContainerView();
-
     render(this._tripDayComponent, this._pointContainerComponent);
 
-    for (let i = 0; i < tripPoints.length; i++) {
-      this._renderPoint(tripPoints[i]);
-    }
+    points.forEach((point) => this._renderPoint(point));
   }
 
   _renderPoint(point) {
@@ -89,7 +82,7 @@ class Trip {
   }
 
   _renderNoPoint() {
-    render(this._tripContainer, new NoPointView());
+    render(this._containerElement, new NoPointView());
   }
 }
 
