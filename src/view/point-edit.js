@@ -1,4 +1,4 @@
-import {CITIES, WAYPOINTS} from "../const.js";
+import {CITIES, WAYPOINTS} from '../const.js';
 import {createHumanTime, createHumanDate, makeForAttribute} from '../utils/render.js';
 import AbstractView from './abstract.js';
 

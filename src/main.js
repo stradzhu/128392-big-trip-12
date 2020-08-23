@@ -12,7 +12,6 @@ const switchMenuElement = tripMainElement.querySelector(`.trip-controls > h2:fir
 const filterElement = tripMainElement.querySelector(`.trip-controls > h2:last-child`);
 const sortElement = containerElement.querySelector(`:scope > h2:first-child`);
 
-// #3. Может лучше передавать в функцию 5-ть параметров, чем сначала заносить их в объект, а потом выносить из него?
 new TripPresenter({
   containerElement,
   tripMainElement,

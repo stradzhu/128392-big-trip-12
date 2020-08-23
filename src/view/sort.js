@@ -1,7 +1,5 @@
 import AbstractView from './abstract.js';
 
-// зачем в Time и Price невидимые svg ? Без них можно в цикле построить 3 сортировки
-
 const createSortTemplate = () => (
   `<form class="trip-events__trip-sort trip-sort" action="#" method="get">
     <span class="trip-sort__item trip-sort__item--day">Day</span>
@@ -36,7 +34,6 @@ class Sort extends AbstractView {
     return createSortTemplate();
   }
 
-  // #9.1 считаю, что название параметра "callback" не уместен, переименовал на handler = обработчик (можно listener = слушатель)
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`change`, handler);
   }

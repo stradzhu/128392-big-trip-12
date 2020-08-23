@@ -33,9 +33,6 @@ class Trip {
       return;
     }
 
-    // #4. Добавим свойство startDay, чтобы в будущем было удобнее фильтровать массив.
-    // Может это плохая идея видоизменять входящие данные? А может startDay из моков пускай приходит?
-    // Могу и не добавлять тогда startDay, тогда 2 раза ниже по коду у меня будет более длинная проверка
     this._points = points.map((point) => {
       point.time.startDay = new Date(+point.time.start).setHours(0, 0, 0, 0);
       return point;
@@ -43,7 +40,6 @@ class Trip {
 
     this._sourcedPoints = this._points.slice();
 
-    // получаем список уникальных дней
     this._dayList = [...new Set(this._points.map(({time: {startDay}}) => startDay))];
 
     render(this._tripMainElement, this._tripInfoComponent, PlaceTemplate.AFTERBEGIN);
@@ -58,11 +54,8 @@ class Trip {
 
     render(this._containerElement, this._tripDaysComponent);
 
-    // #5. Боюсь, не будет ли бага, что какой-то день отрендерится раньше, чем предыдущий?
-    // Ведь forEach никого ждать не будет, чуть ниже, решил использовать for of (метод renderDay)
     this._dayList.forEach((day, index) => {
-      this._renderDay(this._sourcedPoints.filter(({time: {startDay}}) => startDay === day),
-          {number: index + 1, date: new Date(day)});
+      this._renderDay(this._sourcedPoints.filter(({time: {startDay}}) => startDay === day), {number: index + 1, date: new Date(day)});
     });
   }
 
@@ -77,20 +70,14 @@ class Trip {
 
     switch (evt.target.value) {
       case `sort-time`:
-        // #2. Если строка получается длинной, то может писать фигурные скобки и return?
-        this._renderDay(this._points.sort(({time: timeA}, {time: timeB}) => (
-          (timeB.end - timeB.start) - (timeA.end - timeA.start)
-        )));
+        this._renderDay(this._points.sort(({time: timeA}, {time: timeB}) => (timeB.end - timeB.start) - (timeA.end - timeA.start)));
         break;
       case `sort-price`:
         this._renderDay(this._points.sort(({price: priceA}, {price: priceB}) => priceB - priceA));
         break;
       default:
-        // сюда вошел sort-event (сортировка по-умолчанию)
-        // #6. Рендер сортировки по-умолчанию повторяется в коде
         this._dayList.forEach((day, index) => {
-          this._renderDay(this._sourcedPoints.filter(({time: {startDay}}) => startDay === day),
-              {number: index + 1, date: new Date(day)});
+          this._renderDay(this._sourcedPoints.filter(({time: {startDay}}) => startDay === day), {number: index + 1, date: new Date(day)});
         });
     }
   }
@@ -103,8 +90,6 @@ class Trip {
     const tripDayComponent = new TripDayView(info);
     const pointListElement = tripDayComponent.getElement().querySelector(`.trip-events__list`);
 
-    // #7. Решил использовать for of и не forEach, т.к. побоялся, что элементы отрендарятся не по порядку.
-    // Не совсем понимаю какие функции (операции) синхронные, а какие нет. Может есть справочник какой-то?
     for (const point of points) {
       this._renderPoint(pointListElement, point);
     }
