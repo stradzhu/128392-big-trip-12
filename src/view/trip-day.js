@@ -28,7 +28,7 @@ const createTripDayTemplate = ({number = ``, date = null}) => (
 );
 
 class TripDay extends AbstractView {
-  constructor(info = {}) {
+  constructor(info) {
     super();
     this._info = info;
   }

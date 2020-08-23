@@ -54,9 +54,7 @@ class Trip {
 
     render(this._containerElement, this._tripDaysComponent);
 
-    this._dayList.forEach((day, index) => {
-      this._renderDay(this._sourcedPoints.filter(({time: {startDay}}) => startDay === day), {number: index + 1, date: new Date(day)});
-    });
+    this._renderDefaultSortTasks();
   }
 
   _renderSort() {
@@ -76,23 +74,25 @@ class Trip {
         this._renderDay(this._points.sort(({price: priceA}, {price: priceB}) => priceB - priceA));
         break;
       default:
-        this._dayList.forEach((day, index) => {
-          this._renderDay(this._sourcedPoints.filter(({time: {startDay}}) => startDay === day), {number: index + 1, date: new Date(day)});
-        });
+        this._renderDefaultSortTasks();
     }
+  }
+
+  _renderDefaultSortTasks() {
+    this._dayList.forEach((day, index) => {
+      this._renderDay(this._sourcedPoints.filter(({time: {startDay}}) => startDay === day), {number: index + 1, date: new Date(day)});
+    });
   }
 
   _clearAllDays() {
     this._tripDaysComponent.getElement().innerHTML = ``;
   }
 
-  _renderDay(points, info) {
+  _renderDay(points, info = {}) {
     const tripDayComponent = new TripDayView(info);
     const pointListElement = tripDayComponent.getElement().querySelector(`.trip-events__list`);
 
-    for (const point of points) {
-      this._renderPoint(pointListElement, point);
-    }
+    points.forEach((point) => this._renderPoint(pointListElement, point));
 
     render(this._tripDaysComponent, tripDayComponent);
   }
