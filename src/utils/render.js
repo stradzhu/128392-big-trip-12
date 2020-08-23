@@ -51,7 +51,9 @@ const replace = (newChild, oldChild) => {
 
   const parent = oldChild.parentElement;
 
-  if (parent === null || oldChild === null || newChild === null) {
+  // #8. Раньше было так: parent === null || oldChild === null || newChild === null
+  // Там можно упрощать?
+  if (!parent || !oldChild || !newChild) {
     throw new Error(`Can't replace unexisting elements`);
   }
 

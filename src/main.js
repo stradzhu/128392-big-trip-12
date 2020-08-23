@@ -4,7 +4,7 @@ import {generatePoint} from './mock/point.js';
 
 import TripPresenter from './presenter/trip.js';
 
-const points = new Array(POINT_COUNT).fill().map(generatePoint);
+const points = new Array(POINT_COUNT).fill().map(generatePoint).sort(({time: {start: a}}, {time: {start: b}})=> a - b);
 
 const containerElement = document.querySelector(`.trip-events`);
 const tripMainElement = document.querySelector(`.trip-main`);
@@ -12,6 +12,7 @@ const switchMenuElement = tripMainElement.querySelector(`.trip-controls > h2:fir
 const filterElement = tripMainElement.querySelector(`.trip-controls > h2:last-child`);
 const sortElement = containerElement.querySelector(`:scope > h2:first-child`);
 
+// #3. Может лучше передавать в функцию 5-ть параметров, чем сначала заносить их в объект, а потом выносить из него?
 new TripPresenter({
   containerElement,
   tripMainElement,
