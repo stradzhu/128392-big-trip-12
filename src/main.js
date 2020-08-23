@@ -4,7 +4,7 @@ import {generatePoint} from './mock/point.js';
 
 import TripPresenter from './presenter/trip.js';
 
-const points = new Array(POINT_COUNT).fill().map(generatePoint);
+const points = new Array(POINT_COUNT).fill().map(generatePoint).sort(({time: {start: a}}, {time: {start: b}})=> a - b);
 
 const containerElement = document.querySelector(`.trip-events`);
 const tripMainElement = document.querySelector(`.trip-main`);

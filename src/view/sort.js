@@ -33,6 +33,10 @@ class Sort extends AbstractView {
   getTemplate() {
     return createSortTemplate();
   }
+
+  setSortTypeChangeHandler(handler) {
+    this.getElement().addEventListener(`change`, handler);
+  }
 }
 
 export default Sort;

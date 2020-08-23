@@ -15,7 +15,6 @@ const TEXT_LIST = [
   `In rutrum ac purus sit amet tempus.`
 ];
 
-
 const generateDestination = () => {
   let photoList = [];
   for (let i = 1, max = getRandomInteger(1, 10); i <= max; i++) {

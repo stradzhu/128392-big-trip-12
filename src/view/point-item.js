@@ -26,6 +26,7 @@ const createTimeTemplate = ({start, end}) => {
   let levelConvertDate = Boolean(Math.trunc(timeDiff / TimeInMilliseconds.DAY))
     + Boolean(Math.trunc(timeDiff / TimeInMilliseconds.HOUR)) + 1;
 
+  // TODO: добавить break или переписать код без switch
   switch (levelConvertDate) {
     case 3:
       humanTimeDiff = createTwoDigitNumber(Math.trunc(timeDiff / TimeInMilliseconds.DAY)) + `D `;
