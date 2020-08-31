@@ -1,5 +1,6 @@
-import {ESCAPE_KEY_CODE, PlaceTemplate} from '../const.js';
-import {render, replace} from '../utils/render.js';
+import {PlaceTemplate} from '../const.js';
+import {render, remove} from '../utils/render.js';
+import {updateItem} from '../utils/common.js';
 
 import TripInfoView from '../view/trip-info.js';
 import TripInfoMainView from '../view/trip-info-main.js';
@@ -9,9 +10,9 @@ import FilterView from '../view/filter.js';
 import SortView from '../view/sort.js';
 import TripDaysView from '../view/trip-days.js';
 import TripDayView from '../view/trip-day.js';
-import PointItemView from '../view/point-item.js';
-import PointEditView from '../view/point-edit.js';
 import NoPointView from '../view/no-point.js';
+
+import PointPresenter from './point.js';
 
 class Trip {
   constructor({containerElement, tripMainElement, switchMenuElement, filterElement, sortElement}) {
@@ -21,10 +22,17 @@ class Trip {
     this._filterElement = filterElement;
     this._sortElement = sortElement;
 
+    this._pointPresenter = {};
+    this._dayComponent = {};
+
     this._tripInfoComponent = new TripInfoView();
     this._tripDaysComponent = new TripDaysView();
 
-    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handle = {
+      modeChange: this._handleModeChange.bind(this),
+      pointChange: this._handlePointChange.bind(this),
+      sortTypeChange: this._handleSortTypeChange.bind(this)
+    };
   }
 
   init(points) {
@@ -60,7 +68,7 @@ class Trip {
   _renderSort() {
     const sortComponent = new SortView();
     render(this._sortElement, sortComponent, PlaceTemplate.AFTEREND);
-    sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    sortComponent.setSortTypeChangeHandler(this._handle.sortTypeChange);
   }
 
   _handleSortTypeChange(evt) {
@@ -78,6 +86,18 @@ class Trip {
     }
   }
 
+  _handleModeChange() {
+    Object
+      .values(this._pointPresenter)
+      .forEach((presenter) => presenter.resetView());
+  }
+
+  _handlePointChange(updatedTask) {
+    this._points = updateItem(this._points, updatedTask);
+    this._sourcedPoints = updateItem(this._sourcedPoints, updatedTask);
+    this._pointPresenter[updatedTask.id].init(updatedTask);
+  }
+
   _renderDefaultSortTasks() {
     this._dayList.forEach((day, index) => {
       this._renderDay(this._sourcedPoints.filter(({time: {startDay}}) => startDay === day), {number: index + 1, date: new Date(day)});
@@ -85,11 +105,23 @@ class Trip {
   }
 
   _clearAllDays() {
-    this._tripDaysComponent.getElement().innerHTML = ``;
+    // очищаем все point (они хранятся внутри дней)
+    Object
+      .values(this._pointPresenter)
+      .forEach((presenter) => presenter.destroy());
+    this._pointPresenter = {};
+
+    // очищаем список дней
+    Object
+      .values(this._dayComponent)
+      .forEach((component) => remove(component));
+    this._dayComponent = {};
   }
 
   _renderDay(points, info = {}) {
     const tripDayComponent = new TripDayView(info);
+    this._dayComponent[info.number ? info.number : `0`] = tripDayComponent;
+
     const pointListElement = tripDayComponent.getElement().querySelector(`.trip-events__list`);
 
     points.forEach((point) => this._renderPoint(pointListElement, point));
@@ -98,33 +130,9 @@ class Trip {
   }
 
   _renderPoint(pointListElement, point) {
-    const pointItemComponent = new PointItemView(point);
-    const pointEditComponent = new PointEditView(point);
-
-    const onEscKeyDown = (evt) => {
-      if (evt.keyCode === ESCAPE_KEY_CODE) {
-        evt.preventDefault();
-        replace(pointItemComponent, pointEditComponent);
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
-
-    pointItemComponent.setEditClickHandler(() => {
-      replace(pointEditComponent, pointItemComponent);
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
-
-    pointEditComponent.setFormSubmitHandler(() => {
-      replace(pointItemComponent, pointEditComponent);
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
-
-    pointEditComponent.setFormCloseHandler(() => {
-      replace(pointItemComponent, pointEditComponent);
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
-
-    render(pointListElement, pointItemComponent);
+    const pointPresenter = new PointPresenter(pointListElement, this._handle.pointChange, this._handle.modeChange);
+    pointPresenter.init(point);
+    this._pointPresenter[point.id] = pointPresenter;
   }
 
   _renderNoPoint() {
