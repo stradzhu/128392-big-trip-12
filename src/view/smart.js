@@ -1,4 +1,4 @@
-import Abstract from "./abstract.js";
+import Abstract from './abstract.js';
 
 class Smart extends Abstract {
   constructor() {

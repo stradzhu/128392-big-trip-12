@@ -15,9 +15,9 @@ import NoPointView from '../view/no-point.js';
 import PointPresenter from './point.js';
 
 class Trip {
-  constructor({containerElement, tripMainElement, switchMenuElement, filterElement, sortElement}) {
+  constructor({containerElement, mainElement, switchMenuElement, filterElement, sortElement}) {
     this._containerElement = containerElement;
-    this._tripMainElement = tripMainElement;
+    this._mainElement = mainElement;
     this._switchMenuElement = switchMenuElement;
     this._filterElement = filterElement;
     this._sortElement = sortElement;
@@ -25,8 +25,8 @@ class Trip {
     this._pointPresenter = {};
     this._dayComponent = {};
 
-    this._tripInfoComponent = new TripInfoView();
-    this._tripDaysComponent = new TripDaysView();
+    this._infoComponent = new TripInfoView();
+    this._daysComponent = new TripDaysView();
 
     this._handle = {
       modeChange: this._handleModeChange.bind(this),
@@ -50,17 +50,17 @@ class Trip {
 
     this._dayList = [...new Set(this._points.map(({time: {startDay}}) => startDay))];
 
-    render(this._tripMainElement, this._tripInfoComponent, PlaceTemplate.AFTERBEGIN);
+    render(this._mainElement, this._infoComponent, PlaceTemplate.AFTERBEGIN);
 
-    render(this._tripInfoComponent, new TripInfoMainView());
-    render(this._tripInfoComponent, new TripInfoCostView(points));
+    render(this._infoComponent, new TripInfoMainView());
+    render(this._infoComponent, new TripInfoCostView(points));
 
     render(this._switchMenuElement, new SwitchTripView(), PlaceTemplate.AFTEREND);
     render(this._filterElement, new FilterView(), PlaceTemplate.AFTEREND);
 
     this._renderSort();
 
-    render(this._containerElement, this._tripDaysComponent);
+    render(this._containerElement, this._daysComponent);
 
     this._renderDefaultSortTasks();
   }
@@ -119,14 +119,14 @@ class Trip {
   }
 
   _renderDay(points, info = {}) {
-    const tripDayComponent = new TripDayView(info);
-    this._dayComponent[info.number ? info.number : `0`] = tripDayComponent;
+    const dayComponent = new TripDayView(info);
+    this._dayComponent[info.number ? info.number : `0`] = dayComponent;
 
-    const pointListElement = tripDayComponent.getElement().querySelector(`.trip-events__list`);
+    const pointListElement = dayComponent.getElement().querySelector(`.trip-events__list`);
 
     points.forEach((point) => this._renderPoint(pointListElement, point));
 
-    render(this._tripDaysComponent, tripDayComponent);
+    render(this._daysComponent, dayComponent);
   }
 
   _renderPoint(pointListElement, point) {

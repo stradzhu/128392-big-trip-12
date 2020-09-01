@@ -1,4 +1,4 @@
-import {DESTINATION, WAYPOINTS} from '../const.js';
+import {destinations, WAYPOINTS} from '../const.js';
 import {createHumanTime, createHumanDate, makeForAttribute} from '../utils/render.js';
 import SmartView from './smart.js';
 import {nanoid} from 'nanoid';
@@ -82,7 +82,7 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
           </label>
           <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.title}" list="destination-list-1">
           <datalist id="destination-list-1">
-            ${DESTINATION.map(({title}) => `<option value="${title}"></option>`).join(``)}
+            ${destinations.map(({title}) => `<option value="${title}"></option>`).join(``)}
           </datalist>
         </div>
 
@@ -194,7 +194,7 @@ class PointEdit extends SmartView {
   _destinationInputHandler(evt) {
     evt.preventDefault();
     const value = evt.target.value;
-    const destination = DESTINATION.filter(({title}) => title === value)[0] || {title: value};
+    const destination = destinations.find(({title}) => title === value) || {title: value};
 
     this.updateData({destination});
   }
@@ -210,18 +210,14 @@ class PointEdit extends SmartView {
       return;
     }
 
-    // сначала закроем "выдайку" со сменой типа маршрута. Наверное, не очень хорошо, каждый раз делать поиск элемента
-    // хотел использовать getElementById но он есть только document
-    this.getElement().querySelector(`#event-type-toggle-1`).click();
-
     if (this._data.waypoint.title.toLowerCase() === target.value) {
+      // Закрытие всплывайки нужно только, если пользователь кликнет на тот же тип маршрута, что уже выбран.
+      // иначе, при клике на другой тип маршрута, вся карточка будет обновлена и закрывать всплывайку смысла нету
+      this.getElement().querySelector(`#event-type-toggle-1`).checked = false;
       return;
     }
 
-    // TODO: метод filter остановить нельзя. Интересно, а что использовать,
-    // если нужно прекратить после нахождения первого совпадения?
-    // (для увеличения быстродействие). Обычный цикл может?
-    this.updateData({waypoint: WAYPOINTS.filter(({title}) => title.toLowerCase() === target.value)[0]});
+    this.updateData({waypoint: WAYPOINTS.find(({title}) => title.toLowerCase() === target.value)});
   }
 
   _formSubmitHandler(evt) {

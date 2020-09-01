@@ -1,7 +1,7 @@
-import {ESCAPE_KEY_CODE} from "../const";
-import {render, replace, remove} from "../utils/render";
-import PointItemView from "../view/point-item";
-import PointEditView from "../view/point-edit";
+import {ESCAPE_KEY_CODE} from '../const.js';
+import {render, replace, remove} from '../utils/render.js';
+import PointItemView from '../view/point-item.js';
+import PointEditView from '../view/point-edit.js';
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -9,13 +9,13 @@ const Mode = {
 };
 
 class Point {
-  constructor(pointListElement, changeData, changeMode) {
-    this._pointListElement = pointListElement;
+  constructor(listElement, changeData, changeMode) {
+    this._listElement = listElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
 
-    this._pointItemComponent = null;
-    this._pointEditComponent = null;
+    this._itemComponent = null;
+    this._editComponent = null;
     this._mode = Mode.DEFAULT;
 
     this._handle = {
@@ -31,37 +31,37 @@ class Point {
   init(point) {
     this._point = point;
 
-    const prevPointItemComponent = this._pointItemComponent;
-    const prevPointEditComponent = this._pointEditComponent;
+    const prevItemComponent = this._itemComponent;
+    const prevEditComponent = this._editComponent;
 
-    this._pointItemComponent = new PointItemView(this._point);
-    this._pointEditComponent = new PointEditView(this._point);
+    this._itemComponent = new PointItemView(this._point);
+    this._editComponent = new PointEditView(this._point);
 
-    this._pointItemComponent.setEditClickHandler(this._handle.editClick);
-    this._pointEditComponent.setFavoriteClickHandler(this._handle.favoriteClick);
-    this._pointEditComponent.setFormSubmitHandler(this._handle.formSubmit);
-    this._pointEditComponent.setFormCloseHandler(this._handle.formClose);
+    this._itemComponent.setEditClickHandler(this._handle.editClick);
+    this._editComponent.setFavoriteClickHandler(this._handle.favoriteClick);
+    this._editComponent.setFormSubmitHandler(this._handle.formSubmit);
+    this._editComponent.setFormCloseHandler(this._handle.formClose);
 
-    if (!prevPointItemComponent || !prevPointEditComponent) {
-      render(this._pointListElement, this._pointItemComponent);
+    if (!prevItemComponent || !prevEditComponent) {
+      render(this._listElement, this._itemComponent);
       return;
     }
 
     if (this._mode === Mode.DEFAULT) {
-      replace(this._pointListElement, prevPointItemComponent);
+      replace(this._listElement, prevItemComponent);
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._pointEditComponent, prevPointEditComponent);
+      replace(this._editComponent, prevEditComponent);
     }
 
-    remove(prevPointItemComponent);
-    remove(prevPointEditComponent);
+    remove(prevItemComponent);
+    remove(prevEditComponent);
   }
 
   destroy() {
-    remove(this._pointItemComponent);
-    remove(this._pointEditComponent);
+    remove(this._itemComponent);
+    remove(this._editComponent);
   }
 
   resetView() {
@@ -71,14 +71,14 @@ class Point {
   }
 
   _replaceCardToForm() {
-    replace(this._pointEditComponent, this._pointItemComponent);
+    replace(this._editComponent, this._itemComponent);
     document.addEventListener(`keydown`, this._handle.escKeyDown);
     this._changeMode();
     this._mode = Mode.EDITING;
   }
 
   _replaceFormToCard() {
-    replace(this._pointItemComponent, this._pointEditComponent);
+    replace(this._itemComponent, this._editComponent);
     document.removeEventListener(`keydown`, this._handle.escKeyDown);
     this._mode = Mode.DEFAULT;
   }
@@ -99,7 +99,7 @@ class Point {
   }
 
   _handleFormClose() {
-    this._pointEditComponent.reset(this._point);
+    this._editComponent.reset(this._point);
     this._replaceFormToCard();
   }
 

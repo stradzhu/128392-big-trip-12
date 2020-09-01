@@ -1,4 +1,4 @@
-import {TimeInMilliseconds, WAYPOINTS, MAX_DAY_GAP, DESTINATION} from '../const.js';
+import {TimeInMilliseconds, WAYPOINTS, MAX_DAY_GAP, destinations} from '../const.js';
 import {getRandomInteger} from '../utils/common.js';
 import {nanoid} from 'nanoid';
 
@@ -14,7 +14,7 @@ const generatePoint = () => {
   return {
     id: nanoid(),
     waypoint,
-    destination: DESTINATION[getRandomInteger(0, DESTINATION.length - 1)],
+    destination: destinations[getRandomInteger(0, destinations.length - 1)],
     price: getRandomInteger(20, 200),
     isFavorite: Boolean(getRandomInteger(0, 1)),
     time: {

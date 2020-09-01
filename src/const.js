@@ -128,7 +128,7 @@ const WAYPOINTS = [
   }
 ];
 
-const DESTINATION = generateDestination();
+const destinations = generateDestination();
 
 function generateDestination() {
   const photoList = () => {
@@ -168,4 +168,4 @@ function generateUniqueOffers() {
   });
 }
 
-export {POINT_COUNT, ESCAPE_KEY_CODE, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, DESTINATION};
+export {POINT_COUNT, ESCAPE_KEY_CODE, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, destinations};
