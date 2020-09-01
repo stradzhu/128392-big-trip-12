@@ -1,5 +1,5 @@
-import {makeForAttribute} from '../utils/render.js';
-import AbstractView from './abstract.js';
+import {makeForAttribute} from '../utils/render';
+import AbstractView from './abstract';
 
 const FILTER_LIST = [
   `Everything`,

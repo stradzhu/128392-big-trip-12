@@ -1,5 +1,6 @@
-import {PlaceTemplate} from '../const.js';
-import AbstractView from '../view/abstract.js';
+import {PlaceTemplate} from '../const';
+import AbstractView from '../view/abstract';
+import moment from 'moment';
 
 const render = (container, child, place = PlaceTemplate.BEFOREEND) => {
   if (container instanceof AbstractView) {
@@ -69,9 +70,9 @@ const remove = (component) => {
 
 const createTwoDigitNumber = (number) => (number < 10 ? `0` : ``) + number;
 
-const createHumanTime = (time) => createTwoDigitNumber(time.getHours()) + `:` + createTwoDigitNumber(time.getMinutes());
+const createHumanTime = (time) => moment(time).format(`HH:mm`);
 
-const createHumanDate = (time) => createTwoDigitNumber(time.getDate()) + `/` + createTwoDigitNumber(time.getMonth() + 1) + `/` + time.getFullYear().toString().slice(-2);
+const createHumanDate = (time) => moment(time).format(`DD/MM/YY`);
 
 const makeForAttribute = (string) => string.replace(/\s/g, `-`).toLowerCase();
 

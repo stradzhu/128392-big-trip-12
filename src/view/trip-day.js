@@ -1,4 +1,4 @@
-import AbstractView from './abstract.js';
+import AbstractView from './abstract';
 
 const NAME_MONTHS = {
   0: `JAN`,

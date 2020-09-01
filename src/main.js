@@ -1,8 +1,6 @@
-import {POINT_COUNT} from './const.js';
-
-import {generatePoint} from './mock/point.js';
-
-import TripPresenter from './presenter/trip.js';
+import {POINT_COUNT} from './const';
+import {generatePoint} from './mock/point';
+import TripPresenter from './presenter/trip';
 
 const points = new Array(POINT_COUNT).fill().map(generatePoint).sort(({time: {start: a}}, {time: {start: b}})=> a - b);
 

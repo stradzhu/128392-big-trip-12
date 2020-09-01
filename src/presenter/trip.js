@@ -1,18 +1,18 @@
-import {PlaceTemplate} from '../const.js';
-import {render, remove} from '../utils/render.js';
-import {updateItem} from '../utils/common.js';
+import {PlaceTemplate} from '../const';
+import {render, remove} from '../utils/render';
+import {updateItem} from '../utils/common';
 
-import TripInfoView from '../view/trip-info.js';
-import TripInfoMainView from '../view/trip-info-main.js';
-import TripInfoCostView from '../view/trip-info-cost.js';
-import SwitchTripView from '../view/switch-trip.js';
-import FilterView from '../view/filter.js';
-import SortView from '../view/sort.js';
-import TripDaysView from '../view/trip-days.js';
-import TripDayView from '../view/trip-day.js';
-import NoPointView from '../view/no-point.js';
+import TripInfoView from '../view/trip-info';
+import TripInfoMainView from '../view/trip-info-main';
+import TripInfoCostView from '../view/trip-info-cost';
+import SwitchTripView from '../view/switch-trip';
+import FilterView from '../view/filter';
+import SortView from '../view/sort';
+import TripDaysView from '../view/trip-days';
+import TripDayView from '../view/trip-day';
+import NoPointView from '../view/no-point';
 
-import PointPresenter from './point.js';
+import PointPresenter from './point';
 
 class Trip {
   constructor({containerElement, mainElement, switchMenuElement, filterElement, sortElement}) {
