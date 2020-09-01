@@ -4,6 +4,34 @@ const POINT_COUNT = getRandomInteger(15, 25);
 
 const ESCAPE_KEY_CODE = 27;
 
+const MAX_DAY_GAP = 7;
+
+const PlaceTemplate = {
+  BEFOREBEGIN: `beforebegin`,
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+  AFTEREND: `afterend`
+};
+
+const TimeInMilliseconds = {
+  MINUTE: 60000,
+  HOUR: 3600000,
+  DAY: 86400000
+};
+
+const OFFERS_LIST = [
+  {title: `Order Uber`, price: 20},
+  {title: `Add luggage`, price: 50},
+  {title: `Switch to comfort`, price: 80},
+  {title: `Rent a car`, price: 200},
+  {title: `Add breakfast`, price: 50},
+  {title: `Book tickets`, price: 40},
+  {title: `Lunch in city`, price: 30},
+  {title: `Add meal`, price: 15},
+  {title: `Choose seats`, price: 5},
+  {title: `Travel by train`, price: 40}
+];
+
 const CITIES = [
   `Amsterdam`,
   `Budapest`,
@@ -23,17 +51,18 @@ const CITIES = [
   `Zagreb`
 ];
 
-const OFFERS_LIST = [
-  {title: `Order Uber`, price: 20},
-  {title: `Add luggage`, price: 50},
-  {title: `Switch to comfort`, price: 80},
-  {title: `Rent a car`, price: 200},
-  {title: `Add breakfast`, price: 50},
-  {title: `Book tickets`, price: 40},
-  {title: `Lunch in city`, price: 30},
-  {title: `Add meal`, price: 15},
-  {title: `Choose seats`, price: 5},
-  {title: `Travel by train`, price: 40}
+const TEXT_LIST = [
+  `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
+  `Cras aliquet varius magna, non porta ligula feugiat eget.`,
+  `Fusce tristique felis at fermentum pharetra.`,
+  `Aliquam id orci ut lectus varius viverra.`,
+  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
+  `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
+  `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
+  `Sed sed nisi sed augue convallis suscipit in sed felis.`,
+  `Aliquam erat volutpat.`,
+  `Nunc fermentum tortor ac porta dapibus.`,
+  `In rutrum ac purus sit amet tempus.`
 ];
 
 const WAYPOINTS = [
@@ -99,20 +128,33 @@ const WAYPOINTS = [
   }
 ];
 
-const MAX_DAY_GAP = 7;
+const destinations = generateDestination();
 
-const PlaceTemplate = {
-  BEFOREBEGIN: `beforebegin`,
-  AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`,
-  AFTEREND: `afterend`
-};
+function generateDestination() {
+  const photoList = () => {
+    let list = [];
+    for (let i = 1, max = getRandomInteger(1, 10); i <= max; i++) {
+      list.push(`${getRandomInteger(1, 10)}.jpg`);
+    }
+    return list;
+  };
 
-const TimeInMilliseconds = {
-  MINUTE: 60000,
-  HOUR: 3600000,
-  DAY: 86400000
-};
+  const description = () => {
+    let text = ``;
+    for (let i = 1, max = getRandomInteger(1, 5); i <= max; i++) {
+      text += (text ? ` ` : ``) + TEXT_LIST[getRandomInteger(0, TEXT_LIST.length - 1)];
+    }
+    return text;
+  };
+
+  return CITIES.map((city)=>{
+    return {
+      title: city,
+      photoList: photoList(),
+      description: description()
+    };
+  });
+}
 
 function generateUniqueOffers() {
   let alreadyAdded = [];
@@ -122,8 +164,8 @@ function generateUniqueOffers() {
       randomInteger = getRandomInteger(0, OFFERS_LIST.length - 1);
     } while (alreadyAdded.includes(randomInteger));
     alreadyAdded.push(randomInteger);
-    return Object.assign({}, OFFERS_LIST[randomInteger], {isChecked: Boolean(getRandomInteger(0, 1))});
+    return Object.assign({}, OFFERS_LIST[randomInteger], {isChecked: false});
   });
 }
 
-export {POINT_COUNT, ESCAPE_KEY_CODE, CITIES, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds};
+export {POINT_COUNT, ESCAPE_KEY_CODE, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, destinations};

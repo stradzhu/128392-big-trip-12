@@ -7,14 +7,14 @@ import TripPresenter from './presenter/trip.js';
 const points = new Array(POINT_COUNT).fill().map(generatePoint).sort(({time: {start: a}}, {time: {start: b}})=> a - b);
 
 const containerElement = document.querySelector(`.trip-events`);
-const tripMainElement = document.querySelector(`.trip-main`);
-const switchMenuElement = tripMainElement.querySelector(`.trip-controls > h2:first-child`);
-const filterElement = tripMainElement.querySelector(`.trip-controls > h2:last-child`);
+const mainElement = document.querySelector(`.trip-main`);
+const switchMenuElement = mainElement.querySelector(`.trip-controls > h2:first-child`);
+const filterElement = mainElement.querySelector(`.trip-controls > h2:last-child`);
 const sortElement = containerElement.querySelector(`:scope > h2:first-child`);
 
 new TripPresenter({
   containerElement,
-  tripMainElement,
+  mainElement,
   switchMenuElement,
   filterElement,
   sortElement
