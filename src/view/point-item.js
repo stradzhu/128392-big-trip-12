@@ -1,6 +1,6 @@
-import {TimeInMilliseconds} from '../const.js';
-import {createTwoDigitNumber, createHumanTime} from '../utils/render.js';
-import AbstractView from './abstract.js';
+import {TimeInMilliseconds} from '../const';
+import {createTwoDigitNumber, createHumanTime} from '../utils/render';
+import AbstractView from './abstract';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {

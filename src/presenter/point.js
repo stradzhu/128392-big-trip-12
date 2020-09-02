@@ -1,7 +1,7 @@
-import {ESCAPE_KEY_CODE} from '../const.js';
-import {render, replace, remove} from '../utils/render.js';
-import PointItemView from '../view/point-item.js';
-import PointEditView from '../view/point-edit.js';
+import {ESCAPE_KEY_CODE} from '../const';
+import {render, replace, remove} from '../utils/render';
+import PointItemView from '../view/point-item';
+import PointEditView from '../view/point-edit';
 
 const Mode = {
   DEFAULT: `DEFAULT`,

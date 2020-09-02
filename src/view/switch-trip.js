@@ -1,4 +1,4 @@
-import AbstractView from './abstract.js';
+import AbstractView from './abstract';
 
 const createSwitchMenuTemplate = () => (
   `<nav class="trip-controls__trip-tabs trip-tabs">

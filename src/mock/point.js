@@ -1,5 +1,5 @@
-import {TimeInMilliseconds, WAYPOINTS, MAX_DAY_GAP, destinations} from '../const.js';
-import {getRandomInteger} from '../utils/common.js';
+import {TimeInMilliseconds, WAYPOINTS, MAX_DAY_GAP, destinations} from '../const';
+import {getRandomInteger} from '../utils/common';
 import {nanoid} from 'nanoid';
 
 const generatePoint = () => {

@@ -1,4 +1,4 @@
-import AbstractView from './abstract.js';
+import AbstractView from './abstract';
 
 const createTripDaysTemplate = () => `<ul class="trip-days"></ul>`;
 

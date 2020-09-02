@@ -1,4 +1,4 @@
-import AbstractView from './abstract.js';
+import AbstractView from './abstract';
 
 const createTripInfoCostTemplate = (points) => {
   const total = points.reduce((sum, {price, waypoint: {offers}}) => (

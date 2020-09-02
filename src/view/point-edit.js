@@ -1,7 +1,9 @@
-import {destinations, WAYPOINTS} from '../const.js';
-import {createHumanTime, createHumanDate, makeForAttribute} from '../utils/render.js';
-import SmartView from './smart.js';
+import {destinations, WAYPOINTS} from '../const';
+import {createHumanTime, createHumanDate, makeForAttribute} from '../utils/render';
+import SmartView from './smart';
 import {nanoid} from 'nanoid';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 // TODO: продумать, как должен выглядеть BLANK_POINT
 const BLANK_POINT = {
@@ -154,8 +156,14 @@ class PointEdit extends SmartView {
     super();
     this._data = PointEdit.parsePointToData(point);
 
+    this._datepicker = {
+      start: null,
+      end: null
+    };
+
     this._handler = {
-      favoriteClick: this._favoriteClickHandler.bind(this),
+      timeStartChange: this._timeStartChangeHandler.bind(this),
+      timeEndChange: this._timeEndChangeHandler.bind(this),
       typePointClick: this._typePointClickHandler.bind(this),
       priceInput: this._priceInputHandler.bind(this),
       destinationInput: this._destinationInputHandler.bind(this),
@@ -164,21 +172,83 @@ class PointEdit extends SmartView {
     };
 
     this._setInnerHandlers();
+    this._setDatepickerStart();
+    this._setDatepickerEnd();
   }
 
   getTemplate() {
     return createPointEditTemplate(this._data);
   }
 
-  reset(task) {
-    this.updateData(PointEdit.parsePointToData(task));
+  reset(point) {
+    this.updateData(PointEdit.parsePointToData(point));
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepickerStart();
+    this._setDatepickerEnd();
     this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormCloseHandler(this._callback.formClose);
+  }
+
+  _setDatepickerStart() {
+    if (this._datepicker.start) {
+      this._datepicker.start.destroy();
+      this._datepicker.start = null;
+    }
+
+    this._datepicker.start = flatpickr(this.getElement().querySelector(`input[name="event-start-time"]`),
+        {
+          enableTime: true,
+          dateFormat: `d/m/y H:i`,
+          time_24hr: true, // eslint-disable-line camelcase
+          maxDate: this._data.time.end,
+          defaultDate: this._data.time.start,
+          onChange: this._handler.timeStartChange
+        }
+    );
+  }
+
+  _setDatepickerEnd() {
+    if (this._datepicker.end) {
+      this._datepicker.end.destroy();
+      this._datepicker.end = null;
+    }
+
+    this._datepicker.end = flatpickr(this.getElement().querySelector(`input[name="event-end-time"]`),
+        {
+          enableTime: true,
+          dateFormat: `d/m/y H:i`,
+          time_24hr: true, // eslint-disable-line camelcase
+          minDate: this._data.time.start,
+          defaultDate: this._data.time.end,
+          onChange: this._handler.timeEndChange
+        }
+    );
+  }
+
+  _timeStartChangeHandler([time]) {
+    this.updateData(
+        {
+          time: {
+            start: time,
+            end: this._data.time.end
+          }
+        }, true);
+    this._setDatepickerEnd(); // обновим его, т.к. изменилась minDate
+  }
+
+  _timeEndChangeHandler([time]) {
+    this.updateData(
+        {
+          time: {
+            start: this._data.time.start,
+            end: time
+          }
+        }, true);
+    this._setDatepickerStart(); // обновим его, т.к. изменилась maxDate
   }
 
   _priceInputHandler(evt) {
@@ -256,8 +326,7 @@ class PointEdit extends SmartView {
   }
 
   static parseDataToPoint(data) {
-    data = Object.assign({}, data);
-    return data;
+    return Object.assign({}, data);
   }
 }
 
