@@ -1,20 +1,18 @@
 import {destinations, WAYPOINTS} from '../const';
 import {createHumanTime, createHumanDate, makeForAttribute} from '../utils/render';
 import SmartView from './smart';
-import {nanoid} from 'nanoid';
+import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
-// TODO: продумать, как должен выглядеть BLANK_POINT
 const BLANK_POINT = {
-  id: nanoid(),
-  waypoint: null,
-  destination: null,
-  price: null,
+  waypoint: WAYPOINTS[0],
+  destination: {},
+  price: ``,
   isFavorite: false,
   time: {
-    start: null,
-    end: null
+    start: new Date(),
+    end: new Date()
   }
 };
 
@@ -41,8 +39,8 @@ const createOffersTemplate = (offers) => {
 };
 
 const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time}) => (
-  `<li class="trip-events__item">
-    <form class="event event--edit" action="#" method="post">
+  `${price ? `<li class="trip-events__item">`
+    : ``}<form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type event__type-btn" for="event-type-toggle-1">
@@ -82,14 +80,14 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
           <label class="event__label event__type-output" for="event-destination-1">
             ${waypoint.title} ${waypoint.place}
           </label>
-          <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.title}" list="destination-list-1">
+          <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.title ? he.encode(destination.title) : ``}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${destinations.map(({title}) => `<option value="${title}"></option>`).join(``)}
           </datalist>
         </div>
 
         <div class="event__field-groupevent__field-group--time">
-          <label class="visually-hidden" for="event-start-time-1">
+          <label class="visually-hidden" form="event-start-time-1">
             From
           </label>
           <input class="event__input event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${createHumanDate(time.start)} ${createHumanTime(time.start)}">
@@ -111,6 +109,8 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
         <button class="event__save-btn btn btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
 
+        <!-- // TODO: номинация "странная логика". Если нету цены, то я думаю, что это новая точка -->
+        ${price ? `
         <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
         <label class="event__favorite-btn" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
@@ -121,7 +121,7 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
 
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
-        </button>
+        </button> ` : ``}
       </header>
 
       <section class="event__details">
@@ -148,7 +148,7 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
 
       </section>
     </form>
-  </li>`
+  ${price ? `</li>` : ``}`
 );
 
 class PointEdit extends SmartView {
@@ -165,9 +165,12 @@ class PointEdit extends SmartView {
       timeStartChange: this._timeStartChangeHandler.bind(this),
       timeEndChange: this._timeEndChangeHandler.bind(this),
       typePointClick: this._typePointClickHandler.bind(this),
-      priceInput: this._priceInputHandler.bind(this),
+      priceInputChange: this._priceInputChangeHandler.bind(this),
+      priceInputKeydown: this._priceInputKeydownHandler.bind(this),
       destinationInput: this._destinationInputHandler.bind(this),
+      favoriteClick: this._favoriteClickHandler.bind(this),
       formSubmit: this._formSubmitHandler.bind(this),
+      formDeleteClick: this._formDeleteClickHandler.bind(this),
       formClose: this._formCloseHandler.bind(this)
     };
 
@@ -180,6 +183,22 @@ class PointEdit extends SmartView {
     return createPointEditTemplate(this._data);
   }
 
+  // Перегружаем метод родителя removeElement,
+  // чтобы при удалении удалялся более ненужный календарь
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepicker.start) {
+      this._datepicker.start.destroy();
+      this._datepicker.start = null;
+    }
+
+    if (this._datepicker.end) {
+      this._datepicker.end.destroy();
+      this._datepicker.end = null;
+    }
+  }
+
   reset(point) {
     this.updateData(PointEdit.parsePointToData(point));
   }
@@ -190,6 +209,7 @@ class PointEdit extends SmartView {
     this._setDatepickerEnd();
     this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
     this.setFormCloseHandler(this._callback.formClose);
   }
 
@@ -251,11 +271,31 @@ class PointEdit extends SmartView {
     this._setDatepickerStart(); // обновим его, т.к. изменилась maxDate
   }
 
-  _priceInputHandler(evt) {
+  _priceInputKeydownHandler(evt) {
+    // Allow: backspace, delete, tab, escape enter and .
+    if ([46, 8, 9, 27, 13].includes(evt.keyCode) ||
+      // Allow: Ctrl+A
+      (evt.keyCode === 65 && evt.ctrlKey === true) ||
+      // Allow: Ctrl+C
+      (evt.keyCode === 67 && evt.ctrlKey === true) ||
+      // Allow: Ctrl+X
+      (evt.keyCode === 88 && evt.ctrlKey === true) ||
+      // Allow: home, end, left, right
+      (evt.keyCode >= 35 && evt.keyCode <= 39)) {
+      // let it happen, don't do anything
+      return;
+    }
+    // Ensure that it is a number and stop the keypress
+    if ((evt.shiftKey || (evt.keyCode < 48 || evt.keyCode > 57)) && (evt.keyCode < 96 || evt.keyCode > 105)) {
+      evt.preventDefault();
+    }
+  }
+
+  _priceInputChangeHandler(evt) {
     evt.preventDefault();
 
     this.updateData({
-      price: evt.target.value
+      price: +evt.target.value
     }, true);
 
     return true;
@@ -269,8 +309,7 @@ class PointEdit extends SmartView {
     this.updateData({destination});
   }
 
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
+  _favoriteClickHandler() {
     this._callback.favoriteClick();
   }
 
@@ -295,6 +334,11 @@ class PointEdit extends SmartView {
     this._callback.formSubmit(PointEdit.parseDataToPoint(this._data));
   }
 
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(PointEdit.parseDataToPoint(this._data));
+  }
+
   _formCloseHandler(evt) {
     evt.preventDefault();
     this._callback.formClose();
@@ -302,23 +346,43 @@ class PointEdit extends SmartView {
 
   _setInnerHandlers() {
     this.getElement().querySelector(`.event__type-list`).addEventListener(`click`, this._handler.typePointClick);
-    this.getElement().querySelector(`.event__input--price`).addEventListener(`change`, this._handler.priceInput);
+    this.getElement().querySelector(`.event__input--price`).addEventListener(`change`, this._handler.priceInputChange);
+    this.getElement().querySelector(`.event__input--price`).addEventListener(`keydown`, this._handler.priceInputKeydown);
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._handler.destinationInput);
   }
 
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
-    this.getElement().querySelector(`input[name="event-favorite"]`).addEventListener(`change`, this._handler.favoriteClick);
+    // при создании новой задачи, у меня нету звездочки
+    if (this._callback.favoriteClick) {
+      this.getElement().querySelector(`input[name="event-favorite"]`).addEventListener(`click`, this._handler.favoriteClick);
+    }
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    this.getElement().querySelector(`form`).addEventListener(`submit`, this._handler.formSubmit);
+
+    // если я убираю обвертку, то this.getElement() это уже форма
+    if (this.getElement().tagName.toLowerCase() === `form`) {
+      this.getElement().classList.add(`trip-events__item`);
+      this.getElement().addEventListener(`submit`, this._handler.formSubmit);
+    } else {
+      this.getElement().querySelector(`form`).addEventListener(`submit`, this._handler.formSubmit);
+    }
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._handler.formDeleteClick);
   }
 
   setFormCloseHandler(callback) {
     this._callback.formClose = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handler.formClose);
+
+    // при создании новой задачи, у меня нету значка свернуть
+    if (this._callback.formClose) {
+      this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handler.formClose);
+    }
   }
 
   static parsePointToData(point) {

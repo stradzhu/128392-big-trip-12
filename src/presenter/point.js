@@ -1,4 +1,4 @@
-import {ESCAPE_KEY_CODE} from '../const';
+import {ESCAPE_KEY_CODE, UserAction, UpdateType} from '../const';
 import {render, replace, remove} from '../utils/render';
 import PointItemView from '../view/point-item';
 import PointEditView from '../view/point-edit';
@@ -22,14 +22,18 @@ class Point {
       editClick: this._handleEditClick.bind(this),
       favoriteClick: this._handleFavoriteClick.bind(this),
       formSubmit: this._handleFormSubmit.bind(this),
+      deleteClick: this._handleDeleteClick.bind(this),
       formClose: this._handleFormClose.bind(this),
       escKeyDown: this._escKeyDownHandler.bind(this)
     };
-
   }
 
-  init(point) {
+  init(point, updateFavorite) {
     this._point = point;
+
+    if (updateFavorite) {
+      return;
+    }
 
     const prevItemComponent = this._itemComponent;
     const prevEditComponent = this._editComponent;
@@ -40,6 +44,7 @@ class Point {
     this._itemComponent.setEditClickHandler(this._handle.editClick);
     this._editComponent.setFavoriteClickHandler(this._handle.favoriteClick);
     this._editComponent.setFormSubmitHandler(this._handle.formSubmit);
+    this._editComponent.setDeleteClickHandler(this._handle.deleteClick);
     this._editComponent.setFormCloseHandler(this._handle.formClose);
 
     if (!prevItemComponent || !prevEditComponent) {
@@ -89,13 +94,35 @@ class Point {
 
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_POINT,
+        UpdateType.FAVORITE,
         Object.assign({}, this._point, {isFavorite: !this._point.isFavorite})
     );
   }
 
   _handleFormSubmit(point) {
-    this._changeData(point);
+    // чтобы понять, какой тип обновления нам нужен PATCH или MINOR нам нужно понять,
+    // что конкретно изменилось, а также какой сейчас тип сортировки.
+    // Например, изменение цены - может быть PATCH если стоит сортировка EVENT или TIME и
+    // оно будет MINOR если поинты сортируются по цене
+    // пока везде MINOR
+    // console.log(this._point) - старые данные
+    // console.log(point) - новые данные
+    // нужно узнать состояние фильтров и сортировки. Как?)
+    this._changeData(
+        UserAction.UPDATE_POINT,
+        UpdateType.PATCH,
+        point
+    );
     this._replaceFormToCard();
+  }
+
+  _handleDeleteClick(point) {
+    this._changeData(
+        UserAction.DELETE_POINT,
+        UpdateType.MINOR,
+        point
+    );
   }
 
   _handleFormClose() {

@@ -6,6 +6,31 @@ const ESCAPE_KEY_CODE = 27;
 
 const MAX_DAY_GAP = 7;
 
+const FilterType = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`,
+};
+
+const SortType = {
+  DEFAULT: `sort-event`,
+  TIME: `sort-time`,
+  PRICE: `sort-price`
+};
+
+const UserAction = {
+  UPDATE_POINT: `UPDATE_POINT`,
+  ADD_POINT: `ADD_POINT`,
+  DELETE_POINT: `DELETE_POINT`
+};
+
+const UpdateType = {
+  FAVORITE: `FAVORITE`,
+  PATCH: `PATCH`,
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`
+};
+
 const PlaceTemplate = {
   BEFOREBEGIN: `beforebegin`,
   AFTERBEGIN: `afterbegin`,
@@ -168,4 +193,4 @@ function generateUniqueOffers() {
   });
 }
 
-export {POINT_COUNT, ESCAPE_KEY_CODE, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, destinations};
+export {POINT_COUNT, ESCAPE_KEY_CODE, FilterType, SortType, UserAction, UpdateType, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, destinations};
