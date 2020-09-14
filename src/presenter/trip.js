@@ -30,8 +30,9 @@ class Trip {
     this._dayComponent = {};
 
     this._sortComponent = new SortView();
-
     this._infoComponent = new TripInfoView();
+    this._infoMainComponent = null;
+    this._infoCostComponent = null;
     this._daysComponent = new TripDaysView();
 
     this._handle = {
@@ -51,10 +52,8 @@ class Trip {
 
     render(this._mainElement, this._infoComponent, PlaceTemplate.AFTERBEGIN);
 
-    render(this._infoComponent, new TripInfoMainView());
-
-    // может нужно TripInfoCostView напрямую с моделью связать? Смутно понимаю как нужно
-    render(this._infoComponent, new TripInfoCostView(this._getPoints()));
+    this._renderInfoMain();
+    this._renderInfoCost();
 
     render(this._switchMenuElement, new SwitchTripView(), PlaceTemplate.AFTEREND);
 
@@ -69,6 +68,10 @@ class Trip {
     this._currentSortType = SortType.DEFAULT;
     this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._pointNewPresenter.init();
+  }
+
+  _getCurrentSortType() {
+    return this._currentSortType;
   }
 
   _getPoints() {
@@ -86,6 +89,19 @@ class Trip {
     }
   }
 
+  _renderInfoMain() {
+    // TODO: уточнить, как правильно спрограмировать это
+    remove(this._infoMainComponent);
+    this._infoMainComponent = new TripInfoMainView();
+    render(this._infoComponent, this._infoMainComponent);
+  }
+
+  _renderInfoCost() {
+    remove(this._infoCostComponent);
+    this._infoCostComponent = new TripInfoCostView(this._getPoints());
+    render(this._infoComponent, this._infoCostComponent);
+  }
+
   _renderSort() {
     remove(this._sortComponent);
     render(this._sortElement, this._sortComponent, PlaceTemplate.AFTEREND);
@@ -99,7 +115,6 @@ class Trip {
     this._renderPoints();
   }
 
-  // TODO: забыл, зачем этот метод
   _handleModeChange() {
     this._pointNewPresenter.destroy();
     Object
@@ -149,6 +164,7 @@ class Trip {
         this._renderPoints();
         break;
     }
+    this._renderInfoCost();
   }
 
   _clearAllDays({resetSortType = false} = {}) {
@@ -218,7 +234,7 @@ class Trip {
   }
 
   _renderPoint(pointListElement, point) {
-    const pointPresenter = new PointPresenter(pointListElement, this._handle.viewAction, this._handle.modeChange);
+    const pointPresenter = new PointPresenter(pointListElement, this._handle.viewAction, this._handle.modeChange, this._getCurrentSortType.bind(this));
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
   }

@@ -38,9 +38,9 @@ const createOffersTemplate = (offers) => {
     </section>`);
 };
 
-const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time}) => (
-  `${price ? `<li class="trip-events__item">`
-    : ``}<form class="event event--edit" action="#" method="post">
+const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time}, isNewPoint = false) => (
+  `${!isNewPoint ? `<li class="trip-events__item">`
+    : ``}<form class="event event--edit ${isNewPoint ? `trip-events__item` : ``}" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type event__type-btn" for="event-type-toggle-1">
@@ -109,8 +109,7 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
         <button class="event__save-btn btn btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
 
-        <!-- // TODO: номинация "странная логика". Если нету цены, то я думаю, что это новая точка -->
-        ${price ? `
+        ${!isNewPoint ? `
         <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
         <label class="event__favorite-btn" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
@@ -148,13 +147,14 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
 
       </section>
     </form>
-  ${price ? `</li>` : ``}`
+  ${!isNewPoint ? `</li>` : ``}`
 );
 
 class PointEdit extends SmartView {
-  constructor(point = BLANK_POINT) {
+  constructor({point = BLANK_POINT, isNewPoint = false}) {
     super();
     this._data = PointEdit.parsePointToData(point);
+    this._isNewPoint = isNewPoint;
 
     this._datepicker = {
       start: null,
@@ -181,7 +181,7 @@ class PointEdit extends SmartView {
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._data);
+    return createPointEditTemplate(this._data, this._isNewPoint);
   }
 
   // Перегружаем метод родителя removeElement,
@@ -296,7 +296,7 @@ class PointEdit extends SmartView {
     evt.preventDefault();
 
     this.updateData({
-      price: +evt.target.value
+      price: Number(evt.target.value)
     }, true);
 
     return true;
@@ -349,6 +349,12 @@ class PointEdit extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
+
+    if (!this._data.price || !this._data.destination.title) {
+      alert(`Please fill in all required fields! price and description`); // eslint-disable-line no-alert
+      return;
+    }
+
     this._callback.formSubmit(PointEdit.parseDataToPoint(this._data));
   }
 
@@ -371,19 +377,17 @@ class PointEdit extends SmartView {
   }
 
   setFavoriteClickHandler(callback) {
-    this._callback.favoriteClick = callback;
-    // при создании новой задачи, у меня нету звездочки
-    if (this._callback.favoriteClick) {
-      this.getElement().querySelector(`input[name="event-favorite"]`).addEventListener(`click`, this._handler.favoriteClick);
+    if (this._isNewPoint) {
+      return;
     }
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector(`input[name="event-favorite"]`).addEventListener(`click`, this._handler.favoriteClick);
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
 
-    // если я убираю обвертку, то this.getElement() это уже форма
-    if (this.getElement().tagName.toLowerCase() === `form`) {
-      this.getElement().classList.add(`trip-events__item`);
+    if (this._isNewPoint) {
       this.getElement().addEventListener(`submit`, this._handler.formSubmit);
     } else {
       this.getElement().querySelector(`form`).addEventListener(`submit`, this._handler.formSubmit);
@@ -396,12 +400,12 @@ class PointEdit extends SmartView {
   }
 
   setFormCloseHandler(callback) {
-    this._callback.formClose = callback;
-
-    // при создании новой задачи, у меня нету значка свернуть
-    if (this._callback.formClose) {
-      this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handler.formClose);
+    if (this._isNewPoint) {
+      return;
     }
+
+    this._callback.formClose = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handler.formClose);
   }
 
   static parsePointToData(point) {

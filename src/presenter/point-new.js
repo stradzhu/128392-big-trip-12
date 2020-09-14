@@ -22,7 +22,7 @@ class PointNew {
       return;
     }
 
-    this._pointEditComponent = new PointEditView();
+    this._pointEditComponent = new PointEditView({isNewPoint: true});
     this._pointEditComponent.setFormSubmitHandler(this._handle.formSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handle.deleteClick);
 
