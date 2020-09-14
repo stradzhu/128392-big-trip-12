@@ -80,7 +80,7 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
           <label class="event__label event__type-output" for="event-destination-1">
             ${waypoint.title} ${waypoint.place}
           </label>
-          <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.title ? he.encode(destination.title) : ``}" list="destination-list-1">
+          <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" data-value="${destination.title ? he.encode(destination.title) : ``}" value="${destination.title ? he.encode(destination.title) : ``}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${destinations.map(({title}) => `<option value="${title}"></option>`).join(``)}
           </datalist>
@@ -167,7 +167,8 @@ class PointEdit extends SmartView {
       typePointClick: this._typePointClickHandler.bind(this),
       priceInputChange: this._priceInputChangeHandler.bind(this),
       priceInputKeydown: this._priceInputKeydownHandler.bind(this),
-      destinationInput: this._destinationInputHandler.bind(this),
+      destinationInputChange: this._destinationInputChangeHandler.bind(this),
+      destinationInputInput: this._destinationInputInputHandler.bind(this),
       favoriteClick: this._favoriteClickHandler.bind(this),
       formSubmit: this._formSubmitHandler.bind(this),
       formDeleteClick: this._formDeleteClickHandler.bind(this),
@@ -301,7 +302,24 @@ class PointEdit extends SmartView {
     return true;
   }
 
-  _destinationInputHandler(evt) {
+  _destinationInputInputHandler(evt) {
+    let value = evt.target.value;
+
+    if (value.length === 1) {
+      value = value.toUpperCase();
+      evt.target.value = value;
+    }
+
+    const find = destinations.find(({title}) => title.indexOf(value) === 0);
+
+    if (find) {
+      evt.target.dataset.value = evt.target.value;
+    } else {
+      evt.target.value = evt.target.dataset.value;
+    }
+  }
+
+  _destinationInputChangeHandler(evt) {
     evt.preventDefault();
     const value = evt.target.value;
     const destination = destinations.find(({title}) => title === value) || {title: value};
@@ -348,7 +366,8 @@ class PointEdit extends SmartView {
     this.getElement().querySelector(`.event__type-list`).addEventListener(`click`, this._handler.typePointClick);
     this.getElement().querySelector(`.event__input--price`).addEventListener(`change`, this._handler.priceInputChange);
     this.getElement().querySelector(`.event__input--price`).addEventListener(`keydown`, this._handler.priceInputKeydown);
-    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._handler.destinationInput);
+    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._handler.destinationInputChange);
+    this.getElement().querySelector(`.event__input--destination`).addEventListener(`input`, this._handler.destinationInputInput);
   }
 
   setFavoriteClickHandler(callback) {
