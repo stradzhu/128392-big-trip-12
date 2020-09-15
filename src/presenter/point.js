@@ -1,4 +1,5 @@
-import {ESCAPE_KEY_CODE} from '../const';
+import moment from 'moment';
+import {ESCAPE_KEY_CODE, UserAction, UpdateType, SortType} from '../const';
 import {render, replace, remove} from '../utils/render';
 import PointItemView from '../view/point-item';
 import PointEditView from '../view/point-edit';
@@ -9,10 +10,11 @@ const Mode = {
 };
 
 class Point {
-  constructor(listElement, changeData, changeMode) {
+  constructor(listElement, changeData, changeMode, getSortType) {
     this._listElement = listElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._getSortType = getSortType;
 
     this._itemComponent = null;
     this._editComponent = null;
@@ -22,24 +24,29 @@ class Point {
       editClick: this._handleEditClick.bind(this),
       favoriteClick: this._handleFavoriteClick.bind(this),
       formSubmit: this._handleFormSubmit.bind(this),
+      deleteClick: this._handleDeleteClick.bind(this),
       formClose: this._handleFormClose.bind(this),
       escKeyDown: this._escKeyDownHandler.bind(this)
     };
-
   }
 
-  init(point) {
+  init(point, updateFavorite) {
     this._point = point;
+
+    if (updateFavorite) {
+      return;
+    }
 
     const prevItemComponent = this._itemComponent;
     const prevEditComponent = this._editComponent;
 
     this._itemComponent = new PointItemView(this._point);
-    this._editComponent = new PointEditView(this._point);
+    this._editComponent = new PointEditView({point: this._point});
 
     this._itemComponent.setEditClickHandler(this._handle.editClick);
     this._editComponent.setFavoriteClickHandler(this._handle.favoriteClick);
     this._editComponent.setFormSubmitHandler(this._handle.formSubmit);
+    this._editComponent.setDeleteClickHandler(this._handle.deleteClick);
     this._editComponent.setFormCloseHandler(this._handle.formClose);
 
     if (!prevItemComponent || !prevEditComponent) {
@@ -89,13 +96,60 @@ class Point {
 
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_POINT,
+        UpdateType.FAVORITE,
         Object.assign({}, this._point, {isFavorite: !this._point.isFavorite})
     );
   }
 
   _handleFormSubmit(point) {
-    this._changeData(point);
+    // чтобы понять, какой тип обновления нам нужен PATCH или MINOR нам нужно понять,
+    // что конкретно изменилось, а также какой сейчас тип сортировки.
+    // Например, изменение цены - может быть PATCH если стоит сортировка EVENT или TIME и
+    // оно будет MINOR если поинты сортируются по цене
+    // this._point - старые данные
+    // point - новые данные
+    // this._getSortType - текущий метод сортировки
+    let updateType = UpdateType.PATCH;
+
+    switch (this._getSortType()) {
+      case SortType.DEFAULT:
+        // можно было и без moment обойтись, но, решил попрактиковаться
+        if (!moment(point.time.start).isSame(this._point.time.start)) {
+          updateType = UpdateType.MINOR;
+        }
+        break;
+      case SortType.TIME:
+        // А тут, мне момент не помог :( вроде есть методв diff но он как-то не так работает (вроде)
+        const diffOld = this._point.time.end.getTime() - this._point.time.start.getTime();
+        const diffNew = point.time.end.getTime() - point.time.start.getTime();
+        if (diffOld !== diffNew) {
+          updateType = UpdateType.MINOR;
+        }
+        break;
+      case SortType.PRICE:
+        if (point.price !== this._point.price) {
+          updateType = UpdateType.MINOR;
+        }
+        break;
+      default:
+        throw new Error(`Unknown SortType in method _handleFormSubmit`);
+    }
+
+    this._changeData(
+        UserAction.UPDATE_POINT,
+        updateType,
+        point
+    );
     this._replaceFormToCard();
+  }
+
+  _handleDeleteClick(point) {
+    this._changeData(
+        UserAction.DELETE_POINT,
+        UpdateType.MINOR,
+        point
+    );
   }
 
   _handleFormClose() {

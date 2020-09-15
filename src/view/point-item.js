@@ -1,6 +1,7 @@
 import {TimeInMilliseconds} from '../const';
 import {createTwoDigitNumber, createHumanTime} from '../utils/render';
 import AbstractView from './abstract';
+import he from 'he';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
@@ -54,7 +55,7 @@ const createPointItemTemplate = ({waypoint, destination, price, time}) => (
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${waypoint.icon}" alt="${waypoint.title}">
       </div>
-      <h3 class="event__title">${waypoint.title} ${waypoint.place} ${destination.title}</h3>
+      <h3 class="event__title">${waypoint.title} ${waypoint.place} ${destination.title ? he.encode(destination.title) : ``}</h3>
 
       <div class="event__schedule">
         ${createTimeTemplate(time)}

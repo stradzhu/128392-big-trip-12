@@ -27,14 +27,6 @@ const render = (container, child, place = PlaceTemplate.BEFOREEND) => {
   }
 };
 
-const renderTemplate = (container, template, place = PlaceTemplate.BEFOREEND) => {
-  if (container instanceof AbstractView) {
-    container = container.getElement();
-  }
-
-  container.insertAdjacentHTML(place, template);
-};
-
 const createElement = (template) => {
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
@@ -60,6 +52,10 @@ const replace = (newChild, oldChild) => {
 };
 
 const remove = (component) => {
+  if (!component) {
+    return;
+  }
+
   if (!(component instanceof AbstractView)) {
     throw new Error(`Can remove only components`);
   }
@@ -76,4 +72,4 @@ const createHumanDate = (time) => moment(time).format(`DD/MM/YY`);
 
 const makeForAttribute = (string) => string.replace(/\s/g, `-`).toLowerCase();
 
-export {render, renderTemplate, createElement, replace, remove, createTwoDigitNumber, createHumanTime, createHumanDate, makeForAttribute};
+export {render, createElement, replace, remove, createTwoDigitNumber, createHumanTime, createHumanDate, makeForAttribute};
