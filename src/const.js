@@ -44,6 +44,21 @@ const TimeInMilliseconds = {
   DAY: 86400000
 };
 
+const NAME_MONTHS = {
+  0: `JAN`,
+  1: `FEB`,
+  2: `MAR`,
+  3: `APR`,
+  4: `MAY`,
+  5: `JUNE`,
+  6: `JULY`,
+  7: `AUG`,
+  8: `SEPT`,
+  9: `OCT`,
+  10: `NOV`,
+  11: `DEC`,
+};
+
 const OFFERS_LIST = [
   {title: `Order Uber`, price: 20},
   {title: `Add luggage`, price: 50},
@@ -193,4 +208,4 @@ function generateUniqueOffers() {
   });
 }
 
-export {POINT_COUNT, ESCAPE_KEY_CODE, FilterType, SortType, UserAction, UpdateType, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, destinations};
+export {POINT_COUNT, ESCAPE_KEY_CODE, FilterType, SortType, UserAction, UpdateType, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, destinations, NAME_MONTHS};

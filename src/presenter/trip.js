@@ -90,9 +90,8 @@ class Trip {
   }
 
   _renderInfoMain() {
-    // TODO: уточнить, как правильно спрограмировать это
     remove(this._infoMainComponent);
-    this._infoMainComponent = new TripInfoMainView();
+    this._infoMainComponent = new TripInfoMainView(this._getPoints());
     render(this._infoComponent, this._infoMainComponent);
   }
 
@@ -164,6 +163,7 @@ class Trip {
         this._renderPoints();
         break;
     }
+    this._renderInfoMain();
     this._renderInfoCost();
   }
 

@@ -25,9 +25,9 @@ const createOffersTemplate = (offers) => {
     `<section class="event__section event__section--offers">
       <h3 class="event__section-title event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-      ${offers.map(({title, price, isChecked}) => (`<div class="event__offer-selector">
+      ${offers.map(({title, price, isChecked}, index) => (`<div class="event__offer-selector">
           <input class="event__offer-checkbox visually-hidden" ${isChecked ? `checked` : ``}
-            id="event-offer-${makeForAttribute(title)}" type="checkbox" name="event-offer-${makeForAttribute(title)}">
+            id="event-offer-${makeForAttribute(title)}" data-index-number="${index}" type="checkbox" name="event-offer-${makeForAttribute(title)}">
           <label class="event__offer-label" for="event-offer-${makeForAttribute(title)}">
             <span class="event__offer-title">${title}</span>
             &plus;
@@ -167,6 +167,7 @@ class PointEdit extends SmartView {
       typePointClick: this._typePointClickHandler.bind(this),
       priceInputChange: this._priceInputChangeHandler.bind(this),
       priceInputKeydown: this._priceInputKeydownHandler.bind(this),
+      offersChange: this._offersChangeHandler, // тут можно без bind
       destinationInputChange: this._destinationInputChangeHandler.bind(this),
       destinationInputInput: this._destinationInputInputHandler.bind(this),
       favoriteClick: this._favoriteClickHandler.bind(this),
@@ -178,6 +179,7 @@ class PointEdit extends SmartView {
     this._setInnerHandlers();
     this._setDatepickerStart();
     this._setDatepickerEnd();
+    this._offersChangeHandler();
   }
 
   getTemplate() {
@@ -208,6 +210,7 @@ class PointEdit extends SmartView {
     this._setInnerHandlers();
     this._setDatepickerStart();
     this._setDatepickerEnd();
+    this._offersChangeHandler();
     this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
@@ -300,6 +303,20 @@ class PointEdit extends SmartView {
     }, true);
 
     return true;
+  }
+
+  _offersChangeHandler() {
+    const offersBlock = this.getElement().querySelector(`.event__available-offers`);
+    if (!offersBlock) {
+      return;
+    }
+
+    offersBlock.addEventListener(`change`, (evt) => {
+      // очень не уверен, что напрямую менять this._data хорошая идея, ведь мы все остальное пропускаем через this.updateData()
+      // но если делать через this.updateData() то возникают проблемы, как точечно передать данные
+      const index = evt.target.dataset.indexNumber;
+      this._data.waypoint.offers[index].isChecked = evt.target.checked;
+    });
   }
 
   _destinationInputInputHandler(evt) {
