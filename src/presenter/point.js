@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {ESCAPE_KEY_CODE, UserAction, UpdateType, SortType} from '../const';
+import {KeyCode, UserAction, UpdateType, SortType} from '../const';
 import {render, replace, remove} from '../utils/render';
 import PointItemView from '../view/point-item';
 import PointEditView from '../view/point-edit';
@@ -158,7 +158,7 @@ class Point {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.keyCode === ESCAPE_KEY_CODE) {
+    if (evt.keyCode === KeyCode.ESCAPE) {
       evt.preventDefault();
       this._handle.formClose();
     }

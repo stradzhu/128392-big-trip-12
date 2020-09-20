@@ -2,7 +2,22 @@ import {getRandomInteger} from './utils/common';
 
 const POINT_COUNT = getRandomInteger(15, 25);
 
-const ESCAPE_KEY_CODE = 27;
+const KeyCode = {
+  BACKSPACE: 8,
+  TAB: 9,
+  ENTER: 13,
+  ESCAPE: 27,
+  END: 35,
+  RIGHT_ARROW: 39,
+  DELETE: 46,
+  0: 48,
+  9: 57,
+  A: 65,
+  C: 67,
+  X: 88,
+  NUMPAD_0: 96,
+  NUMPAD_9: 105,
+};
 
 const MAX_DAY_GAP = 7;
 
@@ -208,4 +223,4 @@ function generateUniqueOffers() {
   });
 }
 
-export {POINT_COUNT, ESCAPE_KEY_CODE, FilterType, SortType, UserAction, UpdateType, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, destinations, NAME_MONTHS};
+export {POINT_COUNT, KeyCode, FilterType, SortType, UserAction, UpdateType, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, destinations, NAME_MONTHS};

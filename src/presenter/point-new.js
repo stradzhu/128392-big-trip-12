@@ -1,7 +1,7 @@
 import {nanoid} from 'nanoid';
 import PointEditView from '../view/point-edit';
 import {remove, render} from '../utils/render';
-import {UserAction, UpdateType, PlaceTemplate, ESCAPE_KEY_CODE} from '../const';
+import {UserAction, UpdateType, PlaceTemplate, KeyCode} from '../const';
 
 class PointNew {
   constructor(listElement, changeData) {
@@ -58,7 +58,7 @@ class PointNew {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.keyCode === ESCAPE_KEY_CODE) {
+    if (evt.keyCode === KeyCode.ESCAPE) {
       evt.preventDefault();
       this.destroy();
     }

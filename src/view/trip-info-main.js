@@ -1,16 +1,19 @@
 import AbstractView from './abstract';
 import {NAME_MONTHS} from '../const';
 
-// Если читать ТЗ то там есть фраза "состоит из пунктов назначения (названий городов), разделённых тире",
-// которую можно трактовать по разному. Я тебе в телеграмм написал самые нелепые случаи, которые могут произойти
-// тут описал по самому простому варианту. И мне нравится эта функция - она простая, логичная и понятная
+const Routes = {
+  SINGLE: 1,
+  DOUBLE: 2,
+  TRIPLE: 3
+};
+
 const createTitle = (point) => {
   switch (point.length) {
-    case 1:
+    case Routes.SINGLE:
       return point[0].destination.title;
-    case 2:
+    case Routes.DOUBLE:
       return `${point[0].destination.title} &mdash; ${point[1].destination.title}`;
-    case 3:
+    case Routes.TRIPLE:
       return `${point[0].destination.title} &mdash; ${point[1].destination.title} &mdash; ${point[2].destination.title}`;
     default:
       return `${point[0].destination.title} &mdash; ... &mdash; ${point[point.length - 1].destination.title}`;
@@ -18,11 +21,10 @@ const createTitle = (point) => {
 };
 
 const createDates = (points) => {
+  const first = points[0].time.start;
   if (points.length === 1) {
-    const first = points[0].time.start;
     return `${first.getDate()} ${NAME_MONTHS[first.getMonth()]}`;
   } else {
-    const first = points[0].time.start;
     const last = points[points.length - 1].time.start;
     return `${first.getDate()} ${NAME_MONTHS[first.getMonth()]} &mdash; ${last.getDate()} ${NAME_MONTHS[last.getMonth()]}`;
   }

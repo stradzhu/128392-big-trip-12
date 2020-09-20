@@ -1,4 +1,4 @@
-import {destinations, WAYPOINTS} from '../const';
+import {destinations, WAYPOINTS, KeyCode} from '../const';
 import {createHumanTime, createHumanDate, makeForAttribute} from '../utils/render';
 import SmartView from './smart';
 import he from 'he';
@@ -276,21 +276,15 @@ class PointEdit extends SmartView {
   }
 
   _priceInputKeydownHandler(evt) {
-    // Allow: backspace, delete, tab, escape enter and .
-    if ([46, 8, 9, 27, 13].includes(evt.keyCode) ||
-      // Allow: Ctrl+A
-      (evt.keyCode === 65 && evt.ctrlKey === true) ||
-      // Allow: Ctrl+C
-      (evt.keyCode === 67 && evt.ctrlKey === true) ||
-      // Allow: Ctrl+X
-      (evt.keyCode === 88 && evt.ctrlKey === true) ||
-      // Allow: home, end, left, right
-      (evt.keyCode >= 35 && evt.keyCode <= 39)) {
-      // let it happen, don't do anything
+    if ([KeyCode.DELETE, KeyCode.BACKSPACE, KeyCode.TAB, KeyCode.ESCAPE, KeyCode.ENTER].includes(evt.keyCode) ||
+      (evt.keyCode === KeyCode.A && evt.ctrlKey) ||
+      (evt.keyCode === KeyCode.C && evt.ctrlKey) ||
+      (evt.keyCode === KeyCode.X && evt.ctrlKey) ||
+      (evt.keyCode >= KeyCode.END && evt.keyCode <= KeyCode.RIGHT_ARROW)) {
       return;
     }
-    // Ensure that it is a number and stop the keypress
-    if ((evt.shiftKey || (evt.keyCode < 48 || evt.keyCode > 57)) && (evt.keyCode < 96 || evt.keyCode > 105)) {
+
+    if ((evt.shiftKey || (evt.keyCode < KeyCode[`0`] || evt.keyCode > KeyCode[`9`])) && (evt.keyCode < KeyCode.NUMPAD_0 || evt.keyCode > KeyCode.NUMPAD_9)) {
       evt.preventDefault();
     }
   }
