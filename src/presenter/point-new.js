@@ -1,12 +1,13 @@
-import {nanoid} from 'nanoid';
 import PointEditView from '../view/point-edit';
 import {remove, render} from '../utils/render';
-import {UserAction, UpdateType, PlaceTemplate, ESCAPE_KEY_CODE} from '../const';
+import {UserAction, UpdateType, PlaceTemplate, KeyCode} from '../const';
 
 class PointNew {
-  constructor(listElement, changeData) {
+  constructor(listElement, changeData, destinations, offers) {
     this._listElement = listElement;
     this._changeData = changeData;
+    this._destinations = destinations;
+    this._offers = offers;
 
     this._pointEditComponent = null;
 
@@ -22,7 +23,11 @@ class PointNew {
       return;
     }
 
-    this._pointEditComponent = new PointEditView({isNewPoint: true});
+    this._pointEditComponent = new PointEditView({
+      isNewPoint: true,
+      destinations: this._destinations,
+      offers: this._offers,
+    });
     this._pointEditComponent.setFormSubmitHandler(this._handle.formSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handle.deleteClick);
 
@@ -48,7 +53,7 @@ class PointNew {
     this._changeData(
         UserAction.ADD_POINT,
         UpdateType.MINOR,
-        Object.assign({id: nanoid()}, point)
+        point
     );
     this.destroy();
   }
@@ -58,7 +63,7 @@ class PointNew {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.keyCode === ESCAPE_KEY_CODE) {
+    if (evt.keyCode === KeyCode.ESCAPE) {
       evt.preventDefault();
       this.destroy();
     }

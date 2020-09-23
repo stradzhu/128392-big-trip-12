@@ -10,16 +10,20 @@ import SortView from '../view/sort';
 import TripDaysView from '../view/trip-days';
 import TripDayView from '../view/trip-day';
 import NoPointView from '../view/no-point';
+import LoadingView from '../view/loading';
 
 import PointPresenter from './point';
 import PointNewPresenter from './point-new';
 
 class Trip {
-  constructor({containerElement, mainElement, switchMenuElement, sortElement}, pointsModel, filterModel) {
+  constructor({containerElement, mainElement, switchMenuElement, sortElement}, pointsModel, filterModel, api, destinations, offers) {
     this._containerElement = containerElement;
     this._mainElement = mainElement;
     this._switchMenuElement = switchMenuElement;
     this._sortElement = sortElement;
+    this._api = api;
+    this._destinations = destinations;
+    this._offers = offers;
 
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
@@ -29,11 +33,14 @@ class Trip {
     this._pointPresenter = {};
     this._dayComponent = {};
 
+    this._isLoading = true;
+
     this._sortComponent = new SortView();
     this._infoComponent = new TripInfoView();
     this._infoMainComponent = null;
     this._infoCostComponent = null;
     this._daysComponent = new TripDaysView();
+    this._loadingComponent = new LoadingView();
 
     this._handle = {
       modeChange: this._handleModeChange.bind(this),
@@ -45,7 +52,7 @@ class Trip {
     this._pointsModel.addObserver(this._handle.modelEvent);
     this._filterModel.addObserver(this._handle.modelEvent);
 
-    this._pointNewPresenter = new PointNewPresenter(this._daysComponent, this._handle.viewAction);
+    this._pointNewPresenter = new PointNewPresenter(this._daysComponent, this._handle.viewAction, this._destinations, this._offers);
   }
 
   init() {
@@ -90,9 +97,8 @@ class Trip {
   }
 
   _renderInfoMain() {
-    // TODO: уточнить, как правильно спрограмировать это
     remove(this._infoMainComponent);
-    this._infoMainComponent = new TripInfoMainView();
+    this._infoMainComponent = new TripInfoMainView(this._getPoints());
     render(this._infoComponent, this._infoMainComponent);
   }
 
@@ -122,27 +128,37 @@ class Trip {
       .forEach((presenter) => presenter.resetView());
   }
 
-  /* _handlePointChange(updatedTask) {
-    this._points = updateItem(this._points, updatedTask);
-    this._sourcedPoints = updateItem(this._sourcedPoints, updatedTask);
-    this._pointPresenter[updatedTask.id].init(updatedTask);
-  } */
-
   _handleViewAction(actionType, updateType, update) {
-
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this._pointsModel.updatePoint(updateType, update);
+        // this._taskPresenter[update.id].setViewState(TaskPresenterViewState.SAVING);
+        this._api.updatePoint(update)
+          .then((response) => {
+            this._pointsModel.updatePoint(updateType, response);
+          });
+        // .catch(() => {
+        //  this._taskPresenter[update.id].setViewState(TaskPresenterViewState.ABORTING);
+        // });
         break;
       case UserAction.ADD_POINT:
-        this._pointsModel.addPoint(updateType, update);
+        // this._taskNewPresenter.setSaving();
+        this._api.addPoint(update)
+          .then((response) => {
+            this._pointsModel.addPoint(updateType, response);
+          });
+        // .catch(() => {
+        //  this._taskNewPresenter.setAborting();
+        // });
         break;
       case UserAction.DELETE_POINT:
-        this._pointsModel.deletePoint(updateType, update);
+        // this._taskPresenter[update.id].setViewState(TaskPresenterViewState.DELETING);
+        this._api.deletePoint(update)
+          .then(() => {
+            this._pointsModel.deletePoint(updateType, update);
+          });
+        // .catch(() => {
+        // this._taskPresenter[update.id].setViewState(TaskPresenterViewState.ABORTING);
+        //  });
         break;
     }
   }
@@ -163,7 +179,13 @@ class Trip {
         this._clearAllDays({resetSortType: true});
         this._renderPoints();
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderPoints();
+        break;
     }
+    this._renderInfoMain();
     this._renderInfoCost();
   }
 
@@ -189,6 +211,11 @@ class Trip {
   }
 
   _renderPoints() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const points = this._getPoints();
 
     if (!points.length) {
@@ -234,13 +261,24 @@ class Trip {
   }
 
   _renderPoint(pointListElement, point) {
-    const pointPresenter = new PointPresenter(pointListElement, this._handle.viewAction, this._handle.modeChange, this._getCurrentSortType.bind(this));
+    const pointPresenter = new PointPresenter(
+        pointListElement,
+        this._handle.viewAction,
+        this._handle.modeChange,
+        this._getCurrentSortType.bind(this),
+        this._destinations,
+        this._offers
+    );
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;
   }
 
   _renderNoPoint() {
     render(this._containerElement, new NoPointView());
+  }
+
+  _renderLoading() {
+    render(this._containerElement, this._loadingComponent);
   }
 }
 

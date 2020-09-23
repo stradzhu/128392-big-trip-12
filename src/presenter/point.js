@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {ESCAPE_KEY_CODE, UserAction, UpdateType, SortType} from '../const';
+import {KeyCode, UserAction, UpdateType, SortType} from '../const';
 import {render, replace, remove} from '../utils/render';
 import PointItemView from '../view/point-item';
 import PointEditView from '../view/point-edit';
@@ -10,11 +10,13 @@ const Mode = {
 };
 
 class Point {
-  constructor(listElement, changeData, changeMode, getSortType) {
+  constructor(listElement, changeData, changeMode, getSortType, destinations, offers) {
     this._listElement = listElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._getSortType = getSortType;
+    this._destinations = destinations;
+    this._offers = offers;
 
     this._itemComponent = null;
     this._editComponent = null;
@@ -41,7 +43,11 @@ class Point {
     const prevEditComponent = this._editComponent;
 
     this._itemComponent = new PointItemView(this._point);
-    this._editComponent = new PointEditView({point: this._point});
+    this._editComponent = new PointEditView({
+      point: this._point,
+      destinations: this._destinations, // destinations и offers нужны внутри
+      offers: this._offers,
+    });
 
     this._itemComponent.setEditClickHandler(this._handle.editClick);
     this._editComponent.setFavoriteClickHandler(this._handle.favoriteClick);
@@ -55,7 +61,7 @@ class Point {
     }
 
     if (this._mode === Mode.DEFAULT) {
-      replace(this._listElement, prevItemComponent);
+      replace(this._itemComponent, prevItemComponent);
     }
 
     if (this._mode === Mode.EDITING) {
@@ -158,7 +164,7 @@ class Point {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.keyCode === ESCAPE_KEY_CODE) {
+    if (evt.keyCode === KeyCode.ESCAPE) {
       evt.preventDefault();
       this._handle.formClose();
     }

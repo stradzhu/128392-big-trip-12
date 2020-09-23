@@ -11,12 +11,12 @@ const createOffersTemplate = (offers) => {
   return (`<h4 class="visually-hidden">Offers:</h4>
   <ul class="event__selected-offers">
     ${offers.filter(({isChecked})=>isChecked).map(({title, price}, index)=>(
-      `<li class="event__offer" ${index > 2 ? `style="display: none"` : ``}>
+      `${index < 3 ? `<li class="event__offer">
         <span class="event__offer-title">${title}</span>
         &plus;
         &euro;
         <span class="event__offer-price">${price}</span>
-      </li>`)).join(``)}
+      </li>` : ``}`)).join(``)}
     </ul>`);
 };
 
@@ -55,7 +55,7 @@ const createPointItemTemplate = ({waypoint, destination, price, time}) => (
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${waypoint.icon}" alt="${waypoint.title}">
       </div>
-      <h3 class="event__title">${waypoint.title} ${waypoint.place} ${destination.title ? he.encode(destination.title) : ``}</h3>
+      <h3 class="event__title">${waypoint.title} ${waypoint.place} ${destination.name ? he.encode(destination.name) : ``}</h3>
 
       <div class="event__schedule">
         ${createTimeTemplate(time)}
