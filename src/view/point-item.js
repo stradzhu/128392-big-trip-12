@@ -11,12 +11,12 @@ const createOffersTemplate = (offers) => {
   return (`<h4 class="visually-hidden">Offers:</h4>
   <ul class="event__selected-offers">
     ${offers.filter(({isChecked})=>isChecked).map(({title, price}, index)=>(
-      `<li class="event__offer" ${index > 2 ? `style="display: none"` : ``}>
+      `${index < 3 ? `<li class="event__offer">
         <span class="event__offer-title">${title}</span>
         &plus;
         &euro;
         <span class="event__offer-price">${price}</span>
-      </li>`)).join(``)}
+      </li>` : ``}`)).join(``)}
     </ul>`);
 };
 

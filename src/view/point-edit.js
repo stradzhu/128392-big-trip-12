@@ -139,7 +139,7 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
           ${destination.photoList ? `
           <div class="event__photos-container">
             <div class="event__photos-tape">
-                ${destination.photoList.map((file) => `<img class="event__photo" src="img/photos/${file}" alt="Event photo">`).join(``)}
+                ${destination.photoList.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join(``)}
             </div>
           </div> ` : ``}
 

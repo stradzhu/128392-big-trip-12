@@ -10,16 +10,18 @@ import SortView from '../view/sort';
 import TripDaysView from '../view/trip-days';
 import TripDayView from '../view/trip-day';
 import NoPointView from '../view/no-point';
+import LoadingView from '../view/loading';
 
 import PointPresenter from './point';
 import PointNewPresenter from './point-new';
 
 class Trip {
-  constructor({containerElement, mainElement, switchMenuElement, sortElement}, pointsModel, filterModel) {
+  constructor({containerElement, mainElement, switchMenuElement, sortElement}, pointsModel, filterModel, api) {
     this._containerElement = containerElement;
     this._mainElement = mainElement;
     this._switchMenuElement = switchMenuElement;
     this._sortElement = sortElement;
+    this._api = api;
 
     this._pointsModel = pointsModel;
     this._filterModel = filterModel;
@@ -29,11 +31,14 @@ class Trip {
     this._pointPresenter = {};
     this._dayComponent = {};
 
+    this._isLoading = true;
+
     this._sortComponent = new SortView();
     this._infoComponent = new TripInfoView();
     this._infoMainComponent = null;
     this._infoCostComponent = null;
     this._daysComponent = new TripDaysView();
+    this._loadingComponent = new LoadingView();
 
     this._handle = {
       modeChange: this._handleModeChange.bind(this),
@@ -128,11 +133,6 @@ class Trip {
   } */
 
   _handleViewAction(actionType, updateType, update) {
-
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
     switch (actionType) {
       case UserAction.UPDATE_POINT:
         this._pointsModel.updatePoint(updateType, update);
@@ -162,6 +162,11 @@ class Trip {
         this._clearAllDays({resetSortType: true});
         this._renderPoints();
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderPoints();
+        break;
     }
     this._renderInfoMain();
     this._renderInfoCost();
@@ -189,6 +194,11 @@ class Trip {
   }
 
   _renderPoints() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const points = this._getPoints();
 
     if (!points.length) {
@@ -241,6 +251,10 @@ class Trip {
 
   _renderNoPoint() {
     render(this._containerElement, new NoPointView());
+  }
+
+  _renderLoading() {
+    render(this._containerElement, this._loadingComponent);
   }
 }
 

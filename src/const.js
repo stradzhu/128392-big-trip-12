@@ -2,6 +2,8 @@ import {getRandomInteger} from './utils/common';
 
 const POINT_COUNT = getRandomInteger(15, 25);
 
+const OFFERS_TYPE_WHERE_PLACE_IN = [`check-in`, `sightseeing`, `restaurant`];
+
 const KeyCode = {
   BACKSPACE: 8,
   TAB: 9,
@@ -223,4 +225,4 @@ function generateUniqueOffers() {
   });
 }
 
-export {POINT_COUNT, KeyCode, FilterType, SortType, UserAction, UpdateType, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, destinations, NAME_MONTHS};
+export {POINT_COUNT, OFFERS_TYPE_WHERE_PLACE_IN, KeyCode, FilterType, SortType, UserAction, UpdateType, WAYPOINTS, MAX_DAY_GAP, PlaceTemplate, TimeInMilliseconds, destinations, NAME_MONTHS};
