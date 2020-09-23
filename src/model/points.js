@@ -71,18 +71,14 @@ class Points extends Observer {
         {},
         point,
         {
-          // поле id сошлось с название с севером
+          // поле id сошлось с севером
+          // поле destination сошлось с севером
           price: point.base_price,
           time: {
             start: new Date(point.date_from),
             end: new Date(point.date_to),
             // добавим свойство startDay для более удобного деления точек по дням
             startDay: new Date(point.date_from).setHours(0, 0, 0, 0),
-          },
-          destination: {
-            description: point.destination.description,
-            photoList: point.destination.pictures,
-            title: point.destination.name
           },
           isFavorite: point.is_favorite,
           waypoint: {
@@ -110,18 +106,23 @@ class Points extends Observer {
         {},
         point,
         {
-          "due_date": point.dueDate instanceof Date ? point.dueDate.toISOString() : null, // На сервере дата хранится в ISO формате
-          "is_archived": point.isArchive,
-          "is_favorite": point.isFavorite,
-          "repeating_days": point.repeating
+          'base_price': point.price,
+          'date_from': point.time.start.toISOString(),
+          'date_to': point.time.end.toISOString(),
+          'is_favorite': point.isFavorite,
+          'type': point.waypoint.type,
+          // с offers сначала удалим неотмеченные, а затем удалим сам ключ isChecked
+          'offers': point.waypoint.offers.filter(({isChecked}) => isChecked).map((offer) => {
+            delete offer.isChecked;
+            return offer;
+          })
         }
     );
 
-    // Ненужные ключи мы удаляем
-    delete adaptedPoint.dueDate;
-    delete adaptedPoint.isArchive;
+    delete adaptedPoint.price;
+    delete adaptedPoint.time;
     delete adaptedPoint.isFavorite;
-    delete adaptedPoint.repeating;
+    delete adaptedPoint.waypoint;
 
     return adaptedPoint;
   }

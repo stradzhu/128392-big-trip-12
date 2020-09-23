@@ -1,20 +1,10 @@
-import {destinations, WAYPOINTS, KeyCode} from '../const';
+import cloneDeep from 'clone-deep';
+import {KeyCode, OFFERS_TYPE_WHERE_PLACE_IN} from '../const';
 import {createHumanTime, createHumanDate, makeForAttribute} from '../utils/render';
 import SmartView from './smart';
 import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-
-const BLANK_POINT = {
-  waypoint: WAYPOINTS[0],
-  destination: {},
-  price: ``,
-  isFavorite: false,
-  time: {
-    start: new Date(),
-    end: new Date()
-  }
-};
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
@@ -38,7 +28,7 @@ const createOffersTemplate = (offers) => {
     </section>`);
 };
 
-const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time}, isNewPoint = false) => (
+const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time}, isNewPoint = false, destinations, offers) => (
   `${!isNewPoint ? `<li class="trip-events__item">`
     : ``}<form class="event event--edit ${isNewPoint ? `trip-events__item` : ``}" action="#" method="post">
       <header class="event__header">
@@ -53,11 +43,11 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Transfer</legend>
 
-              ${WAYPOINTS.filter(({place}) => (place === `to`)).map(({title}) => (`
+              ${offers.filter(({type}) => !OFFERS_TYPE_WHERE_PLACE_IN.includes(type)).map(({type}) => (`
                 <div class="event__type-item">
-                  <input id="event-type-${title.toLowerCase()}-1" class="event__type-input visually-hidden" type="radio"
-                      name="event-type" value="${title.toLowerCase()}" ${waypoint.title === title ? `checked` : ``}>
-                  <label class="event__type-label event__type-label--${title.toLowerCase()}" for="event-type-${title.toLowerCase()}-1">${title}</label>
+                  <input id="event-type-${type}-1" class="event__type-input visually-hidden" type="radio"
+                      name="event-type" value="${type}" ${waypoint.title.toLowerCase() === type ? `checked` : ``}>
+                  <label class="event__type-label event__type-label--${type}" for="event-type-${type}-1">${type.charAt(0).toUpperCase() + type.slice(1)}</label>
                 </div>`)).join(``)}
 
             </fieldset>
@@ -65,11 +55,11 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Activity</legend>
 
-              ${WAYPOINTS.filter(({place}) => (place === `in`)).map(({title}) => (`
+              ${offers.filter(({type}) => OFFERS_TYPE_WHERE_PLACE_IN.includes(type)).map(({type}) => (`
                 <div class="event__type-item">
-                  <input id="event-type-${title.toLowerCase()}-1" class="event__type-input visually-hidden" type="radio"
-                      name="event-type" value="${title.toLowerCase()}" ${waypoint.title === title ? `checked` : ``}>
-                  <label class="event__type-label event__type-label--${title.toLowerCase()}" for="event-type-${title.toLowerCase()}-1">${title}</label>
+                  <input id="event-type-${type}-1" class="event__type-input visually-hidden" type="radio"
+                      name="event-type" value="${type}" ${waypoint.title.toLowerCase() === type ? `checked` : ``}>
+                  <label class="event__type-label event__type-label--${type}" for="event-type-${type}-1">${type.charAt(0).toUpperCase() + type.slice(1)}</label>
                 </div>`)).join(``)}
 
             </fieldset>
@@ -80,9 +70,9 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
           <label class="event__label event__type-output" for="event-destination-1">
             ${waypoint.title} ${waypoint.place}
           </label>
-          <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" data-value="${destination.title ? he.encode(destination.title) : ``}" value="${destination.title ? he.encode(destination.title) : ``}" list="destination-list-1">
+          <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" data-value="${destination.name ? he.encode(destination.name) : ``}" value="${destination.name ? he.encode(destination.name) : ``}" list="destination-list-1">
           <datalist id="destination-list-1">
-            ${destinations.map(({title}) => `<option value="${title}"></option>`).join(``)}
+            ${destinations.map(({name}) => `<option value="${name}"></option>`).join(``)}
           </datalist>
         </div>
 
@@ -127,7 +117,7 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
 
         ${createOffersTemplate(waypoint.offers)}
 
-        ${destination.description || destination.photoList ? `
+        ${destination.description || destination.pictures ? `
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
 
@@ -136,10 +126,10 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
             ${destination.description}
           </p> ` : ``}
 
-          ${destination.photoList ? `
+          ${destination.pictures ? `
           <div class="event__photos-container">
             <div class="event__photos-tape">
-                ${destination.photoList.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join(``)}
+                ${destination.pictures.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join(``)}
             </div>
           </div> ` : ``}
 
@@ -151,10 +141,33 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
 );
 
 class PointEdit extends SmartView {
-  constructor({point = BLANK_POINT, isNewPoint = false}) {
+  constructor({point, isNewPoint = false, destinations, offers}) {
     super();
+
+    // BLANK_POINT из констант сверху убрал, т.к. в него нужно подмешать данные из оферс
+    if (!point) {
+      point = {
+        waypoint: {
+          title: offers[0].type.charAt(0).toUpperCase() + offers[0].type.slice(1),
+          place: OFFERS_TYPE_WHERE_PLACE_IN.includes(offers[0].type) ? `in` : `to`,
+          icon: `${offers[0].type}.png`,
+          offers: offers[0].offers,
+          type: offers[0].type
+        },
+        destination: {},
+        price: ``,
+        isFavorite: false,
+        time: {
+          start: new Date(),
+          end: new Date()
+        }
+      };
+    }
+
     this._data = PointEdit.parsePointToData(point);
     this._isNewPoint = isNewPoint;
+    this._destinations = destinations;
+    this._offers = offers;
 
     this._datepicker = {
       start: null,
@@ -183,7 +196,7 @@ class PointEdit extends SmartView {
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._data, this._isNewPoint);
+    return createPointEditTemplate(this._data, this._isNewPoint, this._destinations, this._offers);
   }
 
   // Перегружаем метод родителя removeElement,
@@ -321,7 +334,7 @@ class PointEdit extends SmartView {
       evt.target.value = value;
     }
 
-    const find = destinations.find(({title}) => title.indexOf(value) === 0);
+    const find = this._destinations.find(({name}) => name.indexOf(value) === 0);
 
     if (find) {
       evt.target.dataset.value = evt.target.value;
@@ -333,7 +346,7 @@ class PointEdit extends SmartView {
   _destinationInputChangeHandler(evt) {
     evt.preventDefault();
     const value = evt.target.value;
-    const destination = destinations.find(({title}) => title === value) || {title: value};
+    const destination = this._destinations.find(({name}) => name === value) || {title: value};
 
     this.updateData({destination});
   }
@@ -355,13 +368,22 @@ class PointEdit extends SmartView {
       return;
     }
 
-    this.updateData({waypoint: WAYPOINTS.find(({title}) => title.toLowerCase() === target.value)});
+    const newWaypoint = cloneDeep(this._offers.find(({type}) => type === target.value));
+    newWaypoint.offers = newWaypoint.offers.map((offer)=>{
+      offer.isChecked = false;
+      return offer;
+    });
+    newWaypoint.title = newWaypoint.type.charAt(0).toUpperCase() + newWaypoint.type.slice(1);
+    newWaypoint.place = OFFERS_TYPE_WHERE_PLACE_IN.includes(newWaypoint.type) ? `in` : `to`;
+    newWaypoint.icon = `${newWaypoint.type}.png`;
+
+    this.updateData({waypoint: newWaypoint});
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
 
-    if (!this._data.price || !this._data.destination.title) {
+    if (!this._data.price || !this._data.destination.name) {
       alert(`Please fill in all required fields! price and description`); // eslint-disable-line no-alert
       return;
     }

@@ -10,11 +10,13 @@ const Mode = {
 };
 
 class Point {
-  constructor(listElement, changeData, changeMode, getSortType) {
+  constructor(listElement, changeData, changeMode, getSortType, destinations, offers) {
     this._listElement = listElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._getSortType = getSortType;
+    this._destinations = destinations;
+    this._offers = offers;
 
     this._itemComponent = null;
     this._editComponent = null;
@@ -41,7 +43,11 @@ class Point {
     const prevEditComponent = this._editComponent;
 
     this._itemComponent = new PointItemView(this._point);
-    this._editComponent = new PointEditView({point: this._point});
+    this._editComponent = new PointEditView({
+      point: this._point,
+      destinations: this._destinations, // destinations и offers нужны внутри
+      offers: this._offers,
+    });
 
     this._itemComponent.setEditClickHandler(this._handle.editClick);
     this._editComponent.setFavoriteClickHandler(this._handle.favoriteClick);
@@ -55,7 +61,7 @@ class Point {
     }
 
     if (this._mode === Mode.DEFAULT) {
-      replace(this._listElement, prevItemComponent);
+      replace(this._itemComponent, prevItemComponent);
     }
 
     if (this._mode === Mode.EDITING) {

@@ -2,7 +2,9 @@ import PointsModel from './model/points';
 
 const Method = {
   GET: `GET`,
-  PUT: `PUT`
+  PUT: `PUT`,
+  POST: `POST`,
+  DELETE: `DELETE`
 };
 
 const SuccessHTTPStatusRange = {
@@ -49,14 +51,31 @@ class Api {
       });
   }
 
-  updatePoint(point) {
-    return this._load({
-      url: `points/${point.id}`,
+  updatePoint(item) {
+    return Promise.all([this._load({
+      url: `points/${item.id}`,
       method: Method.PUT,
-      body: JSON.stringify(PointsModel.adaptToServer(point)),
+      body: JSON.stringify(PointsModel.adaptToServer(item)),
       headers: new Headers({"Content-Type": `application/json`})
-    })
-      .then(PointsModel.adaptToClient);
+    }), this.getOffers()])
+      .then(([point, offers]) => PointsModel.adaptToClient(point, offers));
+  }
+
+  addPoint(item) {
+    return Promise.all([this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(PointsModel.adaptToServer(item)),
+      headers: new Headers({"Content-Type": `application/json`})
+    }), this.getOffers()])
+      .then(([point, offers]) => PointsModel.adaptToClient(point, offers));
+  }
+
+  deletePoint(item) {
+    return this._load({
+      url: `points/${item.id}`,
+      method: Method.DELETE
+    });
   }
 
   _load({
