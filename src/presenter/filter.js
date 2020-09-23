@@ -20,7 +20,6 @@ class Filter {
   init() {
     this._currentFilter = this._filterModel.getFilter();
 
-    // TODO: чё-то логику с прев понять не могу
     const prevFilterComponent = this._filterComponent;
 
     this._filterComponent = new FilterView(FilterType, this._currentFilter);

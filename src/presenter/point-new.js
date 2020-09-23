@@ -36,9 +36,26 @@ class PointNew {
     document.addEventListener(`keydown`, this._handle.escKeyDown);
   }
 
+  setSaving() {
+    this._pointEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._pointEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this._pointEditComponent.shake(resetFormState);
+  }
+
   destroy() {
-    // TODO что не попонимаю зачем тут так много кода? Можно просто снять обработчик и все, та и то...
-    // ведь нет елемента, нет обработчика
     if (!this._pointEditComponent) {
       return;
     }
@@ -55,7 +72,6 @@ class PointNew {
         UpdateType.MINOR,
         point
     );
-    this.destroy();
   }
 
   _handleDeleteClick() {

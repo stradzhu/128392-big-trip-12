@@ -43,5 +43,5 @@ Promise.all([api.getDestinations(), api.getOffers(), api.getPoints()])
   })
   .catch((err) => {
     pointsModel.setPoints(UpdateType.INIT, []);
-    console.error(err); // eslint-disable-line no-console
+    throw err;
   });

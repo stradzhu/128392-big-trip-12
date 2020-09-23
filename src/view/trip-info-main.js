@@ -10,13 +10,13 @@ const Routes = {
 const createTitle = (point) => {
   switch (point.length) {
     case Routes.SINGLE:
-      return point[0].destination.title;
+      return point[0].destination.name;
     case Routes.DOUBLE:
-      return `${point[0].destination.title} &mdash; ${point[1].destination.title}`;
+      return `${point[0].destination.name} &mdash; ${point[1].destination.name}`;
     case Routes.TRIPLE:
-      return `${point[0].destination.title} &mdash; ${point[1].destination.title} &mdash; ${point[2].destination.title}`;
+      return `${point[0].destination.name} &mdash; ${point[1].destination.name} &mdash; ${point[2].destination.name}`;
     default:
-      return `${point[0].destination.title} &mdash; ... &mdash; ${point[point.length - 1].destination.title}`;
+      return `${point[0].destination.name} &mdash; ... &mdash; ${point[point.length - 1].destination.name}`;
   }
 };
 

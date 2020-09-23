@@ -25,6 +25,7 @@ class Api {
       return Promise.resolve(this._destinations);
     } else {
       return this._load({url: `destinations`})
+        .then(Api.toJSON)
         .then((destinations) => {
           this._destinations = destinations;
           return destinations;
@@ -37,6 +38,7 @@ class Api {
       return Promise.resolve(this._offers);
     } else {
       return this._load({url: `offers`})
+        .then(Api.toJSON)
         .then((offers) => {
           this._offers = offers;
           return offers;
@@ -45,7 +47,7 @@ class Api {
   }
 
   getPoints() {
-    return Promise.all([this._load({url: `points`}), this.getOffers()])
+    return Promise.all([this._load({url: `points`}).then(Api.toJSON), this.getOffers()])
       .then(([points, offers]) => {
         return points.map((point) => PointsModel.adaptToClient(point, offers));
       });
@@ -57,7 +59,7 @@ class Api {
       method: Method.PUT,
       body: JSON.stringify(PointsModel.adaptToServer(item)),
       headers: new Headers({"Content-Type": `application/json`})
-    }), this.getOffers()])
+    }).then(Api.toJSON), this.getOffers()])
       .then(([point, offers]) => PointsModel.adaptToClient(point, offers));
   }
 
@@ -67,7 +69,7 @@ class Api {
       method: Method.POST,
       body: JSON.stringify(PointsModel.adaptToServer(item)),
       headers: new Headers({"Content-Type": `application/json`})
-    }), this.getOffers()])
+    }).then(Api.toJSON), this.getOffers()])
       .then(([point, offers]) => PointsModel.adaptToClient(point, offers));
   }
 
@@ -88,7 +90,6 @@ class Api {
 
     return fetch(`${this._endPoint}/${url}`, {method, body, headers})
       .then(Api.checkStatus)
-      .then(Api.toJSON)
       .catch(Api.catchError);
   }
 
