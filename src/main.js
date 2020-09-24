@@ -1,4 +1,4 @@
-import {UpdateType, MenuItem} from './const';
+import {UpdateType} from './const';
 import TripPresenter from './presenter/trip';
 import FilterPresenter from './presenter/filter';
 import PointsModel from './model/points';
@@ -40,6 +40,7 @@ Promise.all([api.getDestinations(), api.getOffers(), api.getPoints()])
     });
 
     pointsModel.setPoints(UpdateType.INIT, points);
+
   })
   .catch((err) => {
     pointsModel.setPoints(UpdateType.INIT, []);

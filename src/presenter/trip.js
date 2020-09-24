@@ -12,6 +12,7 @@ import TripDayView from '../view/trip-day';
 import NoPointView from '../view/no-point';
 import LoadingView from '../view/loading';
 import AddPointView from '../view/add-point';
+import StatisticsView from '../view/statistics';
 
 import PointPresenter, {State as PointPresenterViewState} from './point';
 import PointNewPresenter from './point-new';
@@ -41,10 +42,11 @@ class Trip {
     this._infoMainComponent = null;
     this._infoCostComponent = null;
     this._switchTripComponent = null;
+    this._statisticsComponent = null;
     this._daysComponent = new TripDaysView();
     this._loadingComponent = new LoadingView();
 
-    this._addPointCompnent = new AddPointView();
+    this._addPointCompnent = new AddPointView(this._mainElement);
     this._addPointCompnent.disabled = false;
 
     this._handle = {
@@ -54,13 +56,8 @@ class Trip {
       sortTypeChange: this._handleSortTypeChange.bind(this)
     };
 
-    this._pointsModel.addObserver(this._handle.modelEvent);
-    this._filterModel.addObserver(this._handle.modelEvent);
-
     this._pointNewPresenter = new PointNewPresenter(this._daysComponent, this._handle.viewAction, this._destinations, this._offers);
-  }
 
-  init() {
     render(this._mainElement, this._infoComponent, PlaceTemplate.AFTERBEGIN);
 
     this._renderInfoMain();
@@ -68,11 +65,26 @@ class Trip {
 
     this._renderSwitchTrip();
 
+    this._pointsModel.addObserver(this._handle.modelEvent);
+    this._filterModel.addObserver(this._handle.modelEvent);
+  }
+
+  init() {
+    render(this._containerElement, this._daysComponent);
     this._renderSort();
 
-    render(this._containerElement, this._daysComponent);
-
     this._renderPoints();
+  }
+
+  destroy() {
+    this._clearAllDays({resetSortType: true});
+
+    remove(this._daysComponent);
+    remove(this._sortComponent);
+
+    // не понимаю, зачем отписываться от модели
+    // this._pointsModel.removeObserver(this._handle.modelEvent);
+    // this._filterModel.removeObserver(this._handle.modelEvent);
   }
 
   createTask() {
@@ -108,14 +120,13 @@ class Trip {
       this._switchTripComponent.setMenuItem(menuItem);
       switch (menuItem) {
         case MenuItem.TABLE:
-          console.log(1);
-          // Показать доску
-          // Скрыть статистику
+          this.init();
+          remove(this._statisticsComponent);
           break;
         case MenuItem.STATS:
-          console.log(2);
-          // Скрыть доску
-          // Показать статистику
+          this.destroy();
+          this._statisticsComponent = new StatisticsView(this._pointsModel.getPoints());
+          render(this._containerElement, this._statisticsComponent);
           break;
       }
     };
