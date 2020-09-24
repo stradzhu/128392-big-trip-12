@@ -6,7 +6,7 @@ import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
-const createOffersTemplate = (offers) => {
+const createOffersTemplate = (offers, isDisabled) => {
   if (!offers.length) {
     return ``;
   }
@@ -16,7 +16,7 @@ const createOffersTemplate = (offers) => {
       <h3 class="event__section-title event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
       ${offers.map(({title, price, isChecked}, index) => (`<div class="event__offer-selector">
-          <input class="event__offer-checkbox visually-hidden" ${isChecked ? `checked` : ``}
+          <input class="event__offer-checkbox visually-hidden" ${isChecked ? `checked` : ``} ${isDisabled ? `disabled` : ``}
             id="event-offer-${makeForAttribute(title)}" data-index-number="${index}" type="checkbox" name="event-offer-${makeForAttribute(title)}">
           <label class="event__offer-label" for="event-offer-${makeForAttribute(title)}">
             <span class="event__offer-title">${title}</span>
@@ -28,7 +28,11 @@ const createOffersTemplate = (offers) => {
     </section>`);
 };
 
-const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time}, isNewPoint = false, destinations, offers) => (
+const createPointEditTemplate = (
+    {waypoint, destination, price, isFavorite, time, isDisabled, isSaving, isDeleting},
+    isNewPoint = false,
+    destinations,
+    offers) => (
   `${!isNewPoint ? `<li class="trip-events__item">`
     : ``}<form class="event event--edit ${isNewPoint ? `trip-events__item` : ``}" action="#" method="post">
       <header class="event__header">
@@ -37,7 +41,7 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="img/icons/${waypoint.icon}" alt="${waypoint.title}">
           </label>
-          <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? `disabled` : ``}>
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
@@ -70,7 +74,9 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
           <label class="event__label event__type-output" for="event-destination-1">
             ${waypoint.title} ${waypoint.place}
           </label>
-          <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" data-value="${destination.name ? he.encode(destination.name) : ``}" value="${destination.name ? he.encode(destination.name) : ``}" list="destination-list-1">
+          <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" list="destination-list-1"
+              data-value="${destination.name ? he.encode(destination.name) : ``}"
+              value="${destination.name ? he.encode(destination.name) : ``}" ${isDisabled ? `disabled` : ``}>
           <datalist id="destination-list-1">
             ${destinations.map(({name}) => `<option value="${name}"></option>`).join(``)}
           </datalist>
@@ -80,12 +86,14 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
           <label class="visually-hidden" form="event-start-time-1">
             From
           </label>
-          <input class="event__input event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${createHumanDate(time.start)} ${createHumanTime(time.start)}">
+          <input class="event__input event__input--time" id="event-start-time-1" type="text" name="event-start-time"
+              value="${createHumanDate(time.start)} ${createHumanTime(time.start)}" ${isDisabled ? `disabled` : ``}>
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${createHumanDate(time.end)} ${createHumanTime(time.end)}">
+          <input class="event__input event__input--time" id="event-end-time-1" type="text" name="event-end-time"
+              value="${createHumanDate(time.end)} ${createHumanTime(time.end)}" ${isDisabled ? `disabled` : ``}>
         </div>
 
         <div class="event__field-group event__field-group--price">
@@ -93,14 +101,20 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+          <input class="event__input event__input--price" id="event-price-1" type="text" name="event-price"
+              value="${price}" ${isDisabled ? `disabled` : ``}>
         </div>
 
-        <button class="event__save-btn btn btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
+        <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>
+          ${isSaving ? `Saving...` : `Save`}
+        </button>
+        <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>
+          ${isDeleting ? `Deleting...` : `Delete`}
+        </button>
 
         ${!isNewPoint ? `
-        <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
+        <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden" type="checkbox"
+            name="event-favorite" ${isFavorite ? `checked` : ``} ${isDisabled ? `disabled` : ``}>
         <label class="event__favorite-btn" for="event-favorite-1">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -108,14 +122,14 @@ const createPointEditTemplate = ({waypoint, destination, price, isFavorite, time
           </svg>
         </label>
 
-        <button class="event__rollup-btn" type="button">
+        <button class="event__rollup-btn" type="button" ${isDisabled ? `disabled` : ``}>
           <span class="visually-hidden">Open event</span>
         </button> ` : ``}
       </header>
 
       <section class="event__details">
 
-        ${createOffersTemplate(waypoint.offers)}
+        ${createOffersTemplate(waypoint.offers, isDisabled)}
 
         ${destination.description || destination.pictures ? `
         <section class="event__section  event__section--destination">
@@ -289,6 +303,7 @@ class PointEdit extends SmartView {
   }
 
   _priceInputKeydownHandler(evt) {
+    // Если сразу видно, что нажатые кнопки нам подходят, то сразу разрешаем, поэтому "return"
     if ([KeyCode.DELETE, KeyCode.BACKSPACE, KeyCode.TAB, KeyCode.ESCAPE, KeyCode.ENTER].includes(evt.keyCode) ||
       (evt.keyCode === KeyCode.A && evt.ctrlKey) ||
       (evt.keyCode === KeyCode.C && evt.ctrlKey) ||
@@ -296,7 +311,9 @@ class PointEdit extends SmartView {
       (evt.keyCode >= KeyCode.END && evt.keyCode <= KeyCode.RIGHT_ARROW)) {
       return;
     }
+    // если дошли сюда, значит не все однозначно, нужно дальше проверять
 
+    // если по условию мы попадаем, значит нажатая кнопка нам не подходит и мы делаем evt.preventDefault();
     if ((evt.shiftKey || (evt.keyCode < KeyCode[`0`] || evt.keyCode > KeyCode[`9`])) && (evt.keyCode < KeyCode.NUMPAD_0 || evt.keyCode > KeyCode.NUMPAD_9)) {
       evt.preventDefault();
     }
@@ -319,8 +336,6 @@ class PointEdit extends SmartView {
     }
 
     offersBlock.addEventListener(`change`, (evt) => {
-      // очень не уверен, что напрямую менять this._data хорошая идея, ведь мы все остальное пропускаем через this.updateData()
-      // но если делать через this.updateData() то возникают проблемы, как точечно передать данные
       const index = evt.target.dataset.indexNumber;
       this._data.waypoint.offers[index].isChecked = evt.target.checked;
     });
@@ -442,11 +457,21 @@ class PointEdit extends SmartView {
   }
 
   static parsePointToData(point) {
-    return Object.assign({}, point, {});
+    return Object.assign({}, point, {
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false
+    });
   }
 
   static parseDataToPoint(data) {
-    return Object.assign({}, data);
+    data = Object.assign({}, data);
+
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+
+    return data;
   }
 }
 

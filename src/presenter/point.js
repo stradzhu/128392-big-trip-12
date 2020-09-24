@@ -9,6 +9,12 @@ const Mode = {
   EDITING: `EDITING`
 };
 
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`
+};
+
 class Point {
   constructor(listElement, changeData, changeMode, getSortType, destinations, offers) {
     this._listElement = listElement;
@@ -34,10 +40,6 @@ class Point {
 
   init(point, updateFavorite) {
     this._point = point;
-
-    if (updateFavorite) {
-      return;
-    }
 
     const prevItemComponent = this._itemComponent;
     const prevEditComponent = this._editComponent;
@@ -65,7 +67,13 @@ class Point {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._editComponent, prevEditComponent);
+      // чтобы клик по "избранное" не закрывал форму
+      if (updateFavorite) {
+        replace(this._editComponent, prevEditComponent);
+      } else {
+        replace(this._itemComponent, prevEditComponent);
+        this._mode = Mode.DEFAULT;
+      }
     }
 
     remove(prevItemComponent);
@@ -80,6 +88,35 @@ class Point {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceFormToCard();
+    }
+  }
+
+  setViewState(state) {
+    const resetFormState = () => {
+      this._editComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._editComponent.updateData({
+          isDisabled: true,
+          isSaving: true
+        });
+        break;
+      case State.DELETING:
+        this._editComponent.updateData({
+          isDisabled: true,
+          isDeleting: true
+        });
+        break;
+      case State.ABORTING:
+        this._itemComponent.shake(resetFormState);
+        this._editComponent.shake(resetFormState);
+        break;
     }
   }
 
@@ -120,13 +157,11 @@ class Point {
 
     switch (this._getSortType()) {
       case SortType.DEFAULT:
-        // можно было и без moment обойтись, но, решил попрактиковаться
         if (!moment(point.time.start).isSame(this._point.time.start)) {
           updateType = UpdateType.MINOR;
         }
         break;
       case SortType.TIME:
-        // А тут, мне момент не помог :( вроде есть методв diff но он как-то не так работает (вроде)
         const diffOld = this._point.time.end.getTime() - this._point.time.start.getTime();
         const diffNew = point.time.end.getTime() - point.time.start.getTime();
         if (diffOld !== diffNew) {
@@ -147,7 +182,6 @@ class Point {
         updateType,
         point
     );
-    this._replaceFormToCard();
   }
 
   _handleDeleteClick(point) {
