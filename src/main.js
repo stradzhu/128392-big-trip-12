@@ -1,4 +1,4 @@
-import {UpdateType} from './const';
+import {UpdateType, MenuItem} from './const';
 import TripPresenter from './presenter/trip';
 import FilterPresenter from './presenter/filter';
 import PointsModel from './model/points';

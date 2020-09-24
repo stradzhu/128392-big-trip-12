@@ -1,4 +1,4 @@
-import {PlaceTemplate, SortType, UpdateType, UserAction, FilterType} from '../const';
+import {MenuItem, PlaceTemplate, SortType, UpdateType, UserAction, FilterType} from '../const';
 import {render, remove} from '../utils/render';
 import {filter} from '../utils/filter';
 
@@ -11,6 +11,7 @@ import TripDaysView from '../view/trip-days';
 import TripDayView from '../view/trip-day';
 import NoPointView from '../view/no-point';
 import LoadingView from '../view/loading';
+import AddPointView from '../view/add-point';
 
 import PointPresenter, {State as PointPresenterViewState} from './point';
 import PointNewPresenter from './point-new';
@@ -39,8 +40,12 @@ class Trip {
     this._infoComponent = new TripInfoView();
     this._infoMainComponent = null;
     this._infoCostComponent = null;
+    this._switchTripComponent = null;
     this._daysComponent = new TripDaysView();
     this._loadingComponent = new LoadingView();
+
+    this._addPointCompnent = new AddPointView();
+    this._addPointCompnent.disabled = false;
 
     this._handle = {
       modeChange: this._handleModeChange.bind(this),
@@ -61,7 +66,7 @@ class Trip {
     this._renderInfoMain();
     this._renderInfoCost();
 
-    render(this._switchMenuElement, new SwitchTripView(), PlaceTemplate.AFTEREND);
+    this._renderSwitchTrip();
 
     this._renderSort();
 
@@ -93,6 +98,29 @@ class Trip {
       default:
         throw new Error(`Unknown sort type in method _getPoints`);
     }
+  }
+
+  _renderSwitchTrip() {
+    this._switchTripComponent = new SwitchTripView();
+    render(this._switchMenuElement, this._switchTripComponent, PlaceTemplate.AFTEREND);
+
+    const handleSwitchTripClick = (menuItem) => {
+      this._switchTripComponent.setMenuItem(menuItem);
+      switch (menuItem) {
+        case MenuItem.TABLE:
+          console.log(1);
+          // Показать доску
+          // Скрыть статистику
+          break;
+        case MenuItem.STATS:
+          console.log(2);
+          // Скрыть доску
+          // Показать статистику
+          break;
+      }
+    };
+
+    this._switchTripComponent.setMenuClickHandler(handleSwitchTripClick);
   }
 
   _renderInfoMain() {
