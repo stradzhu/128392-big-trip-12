@@ -17,6 +17,11 @@ const KeyCode = {
   NUMPAD_9: 105,
 };
 
+const MenuItem = {
+  TABLE: `Table`,
+  STATS: `Stats`
+};
+
 const FilterType = {
   EVERYTHING: `everything`,
   FUTURE: `future`,
@@ -71,4 +76,4 @@ const NAME_MONTHS = {
   11: `DEC`,
 };
 
-export {OFFERS_TYPE_WHERE_PLACE_IN, KeyCode, FilterType, SortType, UserAction, UpdateType, PlaceTemplate, TimeInMilliseconds, NAME_MONTHS};
+export {OFFERS_TYPE_WHERE_PLACE_IN, KeyCode, MenuItem, FilterType, SortType, UserAction, UpdateType, PlaceTemplate, TimeInMilliseconds, NAME_MONTHS};
