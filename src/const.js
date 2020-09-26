@@ -1,20 +1,24 @@
-const OFFERS_TYPE_WHERE_PLACE_IN = [`check-in`, `sightseeing`, `restaurant`];
+const OFFERS_TYPE_ACTIVITY = [`check-in`, `sightseeing`, `restaurant`];
 
 const KeyCode = {
-  BACKSPACE: 8,
-  TAB: 9,
-  ENTER: 13,
-  ESCAPE: 27,
+  FIST_GROUP: {
+    BACKSPACE: 8,
+    TAB: 9,
+    ENTER: 13,
+    ESCAPE: 27,
+    DELETE: 46,
+  },
+  SECOND_GROUP: {
+    A: 65,
+    C: 67,
+    X: 88
+  },
   END: 35,
   RIGHT_ARROW: 39,
-  DELETE: 46,
-  0: 48,
-  9: 57,
-  A: 65,
-  C: 67,
-  X: 88,
-  NUMPAD_0: 96,
-  NUMPAD_9: 105,
+  SUB_ZERO: 48,
+  SUB_NINE: 57,
+  NUM_ZERO: 96,
+  NUM_NINE: 105,
 };
 
 const MenuItem = {
@@ -76,4 +80,4 @@ const NAME_MONTHS = {
   11: `DEC`,
 };
 
-export {OFFERS_TYPE_WHERE_PLACE_IN, KeyCode, MenuItem, FilterType, SortType, UserAction, UpdateType, PlaceTemplate, TimeInMilliseconds, NAME_MONTHS};
+export {OFFERS_TYPE_ACTIVITY, KeyCode, MenuItem, FilterType, SortType, UserAction, UpdateType, PlaceTemplate, TimeInMilliseconds, NAME_MONTHS};

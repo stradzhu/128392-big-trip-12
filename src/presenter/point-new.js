@@ -3,11 +3,10 @@ import {remove, render} from '../utils/render';
 import {UserAction, UpdateType, PlaceTemplate, KeyCode} from '../const';
 
 class PointNew {
-  constructor(listElement, changeData, destinations, offers) {
+  constructor(listElement, changeData, models) {
     this._listElement = listElement;
     this._changeData = changeData;
-    this._destinations = destinations;
-    this._offers = offers;
+    this._models = models;
 
     this._pointEditComponent = null;
 
@@ -18,15 +17,16 @@ class PointNew {
     };
   }
 
-  init() {
+  init(callback) {
     if (this._pointEditComponent !== null) {
       return;
     }
 
+    this._destroyCallback = callback;
+
     this._pointEditComponent = new PointEditView({
       isNewPoint: true,
-      destinations: this._destinations,
-      offers: this._offers,
+      models: this._models
     });
     this._pointEditComponent.setFormSubmitHandler(this._handle.formSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handle.deleteClick);
@@ -60,6 +60,10 @@ class PointNew {
       return;
     }
 
+    if (this._destroyCallback) {
+      this._destroyCallback();
+    }
+
     remove(this._pointEditComponent);
     this._pointEditComponent = null;
 
@@ -79,7 +83,7 @@ class PointNew {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.keyCode === KeyCode.ESCAPE) {
+    if (evt.keyCode === KeyCode.FIST_GROUP.ESCAPE) {
       evt.preventDefault();
       this.destroy();
     }

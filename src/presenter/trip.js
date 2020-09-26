@@ -18,17 +18,13 @@ import PointPresenter, {State as PointPresenterViewState} from './point';
 import PointNewPresenter from './point-new';
 
 class Trip {
-  constructor({containerElement, mainElement, switchMenuElement, sortElement}, pointsModel, filterModel, api, destinations, offers) {
+  constructor({containerElement, mainElement, switchMenuElement, sortElement}, models, api) {
     this._containerElement = containerElement;
     this._mainElement = mainElement;
     this._switchMenuElement = switchMenuElement;
     this._sortElement = sortElement;
+    this._models = models;
     this._api = api;
-    this._destinations = destinations;
-    this._offers = offers;
-
-    this._pointsModel = pointsModel;
-    this._filterModel = filterModel;
 
     this._currentSortType = SortType.DEFAULT;
 
@@ -46,17 +42,18 @@ class Trip {
     this._daysComponent = new TripDaysView();
     this._loadingComponent = new LoadingView();
 
-    this._addPointCompnent = new AddPointView(this._mainElement);
-    this._addPointCompnent.disabled = false;
+    this._addPointComponent = new AddPointView(this._mainElement);
+    this._addPointComponent.disabled = false;
 
     this._handle = {
       modeChange: this._handleModeChange.bind(this),
       viewAction: this._handleViewAction.bind(this),
       modelEvent: this._handleModelEvent.bind(this),
-      sortTypeChange: this._handleSortTypeChange.bind(this)
+      sortTypeChange: this._handleSortTypeChange.bind(this),
+      destroyCreatePoint: this._handleDestroyCreatePoint.bind(this)
     };
 
-    this._pointNewPresenter = new PointNewPresenter(this._daysComponent, this._handle.viewAction, this._destinations, this._offers);
+    this._pointNewPresenter = new PointNewPresenter(this._daysComponent, this._handle.viewAction, this._models);
 
     render(this._mainElement, this._infoComponent, PlaceTemplate.AFTERBEGIN);
 
@@ -64,15 +61,15 @@ class Trip {
     this._renderInfoCost();
 
     this._renderSwitchTrip();
-
-    this._pointsModel.addObserver(this._handle.modelEvent);
-    this._filterModel.addObserver(this._handle.modelEvent);
   }
 
   init() {
     render(this._containerElement, this._daysComponent);
-    this._renderSort();
 
+    this._models.points.addObserver(this._handle.modelEvent);
+    this._models.filter.addObserver(this._handle.modelEvent);
+
+    this._renderSort();
     this._renderPoints();
   }
 
@@ -82,15 +79,24 @@ class Trip {
     remove(this._daysComponent);
     remove(this._sortComponent);
 
-    // не понимаю, зачем отписываться от модели
-    // this._pointsModel.removeObserver(this._handle.modelEvent);
-    // this._filterModel.removeObserver(this._handle.modelEvent);
+    this._models.points.removeObserver(this._handle.modelEvent);
+    this._models.filter.removeObserver(this._handle.modelEvent);
   }
 
-  createTask() {
+  createPoint() {
     this._currentSortType = SortType.DEFAULT;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._pointNewPresenter.init();
+    this._models.filter.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._addPointComponent.disabled = true;
+
+    this.init();
+    remove(this._statisticsComponent);
+    this._switchTripComponent.setMenuItem(MenuItem.TABLE);
+
+    this._pointNewPresenter.init(this._handle.destroyCreatePoint);
+  }
+
+  _handleDestroyCreatePoint() {
+    this._addPointComponent.disabled = false;
   }
 
   _getCurrentSortType() {
@@ -98,7 +104,7 @@ class Trip {
   }
 
   _getPoints() {
-    const points = this._pointsModel.getPoints().slice();
+    const points = this._models.points.getPoints().slice();
 
     switch (this._currentSortType) {
       case SortType.DEFAULT:
@@ -125,7 +131,7 @@ class Trip {
           break;
         case MenuItem.STATS:
           this.destroy();
-          this._statisticsComponent = new StatisticsView(this._pointsModel.getPoints());
+          this._statisticsComponent = new StatisticsView(this._models.points.getPoints());
           render(this._containerElement, this._statisticsComponent);
           break;
       }
@@ -169,10 +175,12 @@ class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
+        if (updateType !== UpdateType.FAVORITE) {
+          this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
+        }
         this._api.updatePoint(update)
           .then((response) => {
-            this._pointsModel.updatePoint(updateType, response);
+            this._models.points.updatePoint(updateType, response);
           })
           .catch((err) => {
             this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
@@ -183,7 +191,7 @@ class Trip {
         this._pointNewPresenter.setSaving();
         this._api.addPoint(update)
           .then((response) => {
-            this._pointsModel.addPoint(updateType, response);
+            this._models.points.addPoint(updateType, response);
           })
           .catch((err) => {
             this._pointNewPresenter.setAborting();
@@ -194,7 +202,7 @@ class Trip {
         this._pointPresenter[update.id].setViewState(PointPresenterViewState.DELETING);
         this._api.deletePoint(update)
           .then(() => {
-            this._pointsModel.deletePoint(updateType, update);
+            this._models.points.deletePoint(updateType, update);
           })
           .catch((err) => {
             this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
@@ -264,7 +272,7 @@ class Trip {
       return;
     }
 
-    const filtredPoints = filter[this._filterModel.getFilter()](points);
+    const filtredPoints = filter[this._models.filter.getFilter()](points);
 
     switch (this._currentSortType) {
       case SortType.DEFAULT:
@@ -307,8 +315,7 @@ class Trip {
         this._handle.viewAction,
         this._handle.modeChange,
         this._getCurrentSortType.bind(this),
-        this._destinations,
-        this._offers
+        this._models
     );
     pointPresenter.init(point);
     this._pointPresenter[point.id] = pointPresenter;

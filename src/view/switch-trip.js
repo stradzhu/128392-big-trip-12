@@ -5,7 +5,7 @@ const ACTIVE_CLASS = `trip-tabs__btn--active`;
 
 const createSwitchMenuTemplate = () => (
   `<nav class="trip-controls__trip-tabs trip-tabs">
-    <a class="trip-tabs__btn" href="#" data-link="${MenuItem.TABLE}">${MenuItem.TABLE}</a>
+    <a class="trip-tabs__btn trip-tabs__btn--active" href="#" data-link="${MenuItem.TABLE}">${MenuItem.TABLE}</a>
     <a class="trip-tabs__btn" href="#" data-link="${MenuItem.STATS}">${MenuItem.STATS}</a>
   </nav>`
 );
