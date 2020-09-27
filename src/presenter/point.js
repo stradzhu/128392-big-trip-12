@@ -143,13 +143,6 @@ class Point {
   }
 
   _handleFormSubmit(point) {
-    // чтобы понять, какой тип обновления нам нужен PATCH или MINOR нам нужно понять,
-    // что конкретно изменилось, а также какой сейчас тип сортировки.
-    // Например, изменение цены - может быть PATCH если стоит сортировка EVENT или TIME и
-    // оно будет MINOR если поинты сортируются по цене
-    // this._point - старые данные
-    // point - новые данные
-    // this._getSortType - текущий метод сортировки
     let updateType = UpdateType.PATCH;
 
     switch (this._getSortType()) {

@@ -12,7 +12,6 @@ class Destinations {
   }
 
   getInfoByName(name) {
-    // Метод find возращает undefined, если ничего не найдено, а мне удобное получить пустой объект
     const info = this._destinations.find((destination) => destination.name === name);
     return info ? info : {};
   }

@@ -69,11 +69,8 @@ Promise.all([apiWithProvider.getDestinations(), apiWithProvider.getOffers(), api
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`/sw.js`)
-    .then(() => {
-      console.log(`ServiceWorker available`); // eslint-disable-line
-    })
     .catch(() => {
-      console.error(`ServiceWorker isn't available`); // eslint-disable-line
+      throw new Error(`ServiceWorker isn't available`);
     });
 });
 

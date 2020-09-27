@@ -191,7 +191,7 @@ class PointEdit extends SmartView {
       typePointClick: this._typePointClickHandler.bind(this),
       priceInputChange: this._priceInputChangeHandler.bind(this),
       priceInputKeydown: this._priceInputKeydownHandler.bind(this),
-      offersChange: this._offersChangeHandler, // тут можно без bind
+      offersChange: this._offersChangeHandler,
       destinationInputChange: this._destinationInputChangeHandler.bind(this),
       destinationInputInput: this._destinationInputInputHandler.bind(this),
       favoriteClick: this._favoriteClickHandler.bind(this),
@@ -210,8 +210,6 @@ class PointEdit extends SmartView {
     return createPointEditTemplate(this._data, this._isNewPoint, this._models);
   }
 
-  // Перегружаем метод родителя removeElement,
-  // чтобы при удалении удалялся более ненужный календарь
   removeElement() {
     super.removeElement();
 
@@ -251,7 +249,7 @@ class PointEdit extends SmartView {
         {
           enableTime: true,
           dateFormat: `d/m/y H:i`,
-          time_24hr: true, // eslint-disable-line camelcase
+          [`time_24hr`]: true,
           maxDate: this._data.time.end,
           defaultDate: this._data.time.start,
           onChange: this._handler.timeStartChange
@@ -269,7 +267,7 @@ class PointEdit extends SmartView {
         {
           enableTime: true,
           dateFormat: `d/m/y H:i`,
-          time_24hr: true, // eslint-disable-line camelcase
+          [`time_24hr`]: true,
           minDate: this._data.time.start,
           defaultDate: this._data.time.end,
           onChange: this._handler.timeEndChange
@@ -285,7 +283,7 @@ class PointEdit extends SmartView {
             end: this._data.time.end
           }
         }, true);
-    this._setDatepickerEnd(); // обновим его, т.к. изменилась minDate
+    this._setDatepickerEnd();
   }
 
   _timeEndChangeHandler([time]) {
@@ -296,11 +294,10 @@ class PointEdit extends SmartView {
             end: time
           }
         }, true);
-    this._setDatepickerStart(); // обновим его, т.к. изменилась maxDate
+    this._setDatepickerStart();
   }
 
   _priceInputKeydownHandler(evt) {
-    // TODO: вот не знаю как это отрефакторить(( не могу придумать имя функции is?????
     if (Object.values(KeyCode.FIST_GROUP).includes(evt.keyCode) ||
       Object.values(KeyCode.SECOND_GROUP).includes(evt.keyCode) && evt.ctrlKey ||
       (evt.keyCode >= KeyCode.END && evt.keyCode <= KeyCode.RIGHT_ARROW)) {
@@ -375,13 +372,10 @@ class PointEdit extends SmartView {
 
     const type = target.value;
     if (this._data.type === type) {
-      // Закрытие всплывайки нужно только, если пользователь кликнет на тот же тип маршрута, что уже выбран.
-      // иначе, при клике на другой тип маршрута, вся карточка будет обновлена и закрывать всплывайку смысла нету
       this.getElement().querySelector(`#event-type-toggle-1`).checked = false;
       return;
     }
 
-    // + очистим список выбранных offers: []
     this.updateData({type, offers: []});
   }
 
@@ -395,8 +389,6 @@ class PointEdit extends SmartView {
       return false;
     }
 
-    // Тут, из-за приведения типов пользователь может ввести "0", который преобразуется в false, но мне это даже
-    // наруку, т.к. стоимось не может быть нулем
     if (!priceElement.value) {
       priceElement.focus();
       this.shake();
