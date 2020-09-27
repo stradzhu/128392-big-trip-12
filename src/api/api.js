@@ -1,4 +1,4 @@
-import PointsModel from './model/points';
+import PointsModel from '../model/points';
 
 const Method = {
   GET: `GET`,
@@ -47,37 +47,48 @@ class Api {
   }
 
   getPoints() {
-    return Promise.all([this._load({url: `points`}).then(Api.toJSON), this.getOffers()])
-      .then(([points, offers]) => {
-        return points.map((point) => PointsModel.adaptToClient(point, offers));
-      });
+    return this._load({url: `points`})
+      .then(Api.toJSON)
+      .then((points) => points.map(PointsModel.adaptToClient));
   }
 
-  updatePoint(item) {
-    return Promise.all([this._load({
-      url: `points/${item.id}`,
+  updatePoint(point) {
+    return this._load({
+      url: `points/${point.id}`,
       method: Method.PUT,
-      body: JSON.stringify(PointsModel.adaptToServer(item)),
+      body: JSON.stringify(PointsModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
-    }).then(Api.toJSON), this.getOffers()])
-      .then(([point, offers]) => PointsModel.adaptToClient(point, offers));
+    })
+      .then(Api.toJSON)
+      .then(PointsModel.adaptToClient);
   }
 
-  addPoint(item) {
-    return Promise.all([this._load({
+  addPoint(point) {
+    return this._load({
       url: `points`,
       method: Method.POST,
-      body: JSON.stringify(PointsModel.adaptToServer(item)),
+      body: JSON.stringify(PointsModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
-    }).then(Api.toJSON), this.getOffers()])
-      .then(([point, offers]) => PointsModel.adaptToClient(point, offers));
+    })
+      .then(Api.toJSON)
+      .then(PointsModel.adaptToClient);
   }
 
-  deletePoint(item) {
+  deletePoint(point) {
     return this._load({
-      url: `points/${item.id}`,
+      url: `points/${point.id}`,
       method: Method.DELETE
     });
+  }
+
+  sync(data) {
+    return this._load({
+      url: `points/sync`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then(Api.toJSON);
   }
 
   _load({

@@ -1,23 +1,29 @@
-import cloneDeep from 'clone-deep';
-import {KeyCode, OFFERS_TYPE_WHERE_PLACE_IN} from '../const';
+import {KeyCode, OFFERS_TYPE_ACTIVITY} from '../const';
 import {createHumanTime, createHumanDate, makeForAttribute} from '../utils/render';
+import {ucFirst} from '../utils/common';
 import SmartView from './smart';
 import he from 'he';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+import '../../node_modules/flatpickr/dist/themes/material_blue.css';
 
-const createOffersTemplate = (offers, isDisabled) => {
-  if (!offers.length) {
+const createOffersTemplate = (offers, availableOffers, isDisabled) => {
+  if (!availableOffers.length) {
     return ``;
   }
+
+  availableOffers = availableOffers.map((offer) => {
+    offer.isChecked = !!offers.find(({title}) => title === offer.title);
+    return offer;
+  });
 
   return (
     `<section class="event__section event__section--offers">
       <h3 class="event__section-title event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-      ${offers.map(({title, price, isChecked}, index) => (`<div class="event__offer-selector">
+      ${availableOffers.map(({title, price, isChecked}) => (`<div class="event__offer-selector">
           <input class="event__offer-checkbox visually-hidden" ${isChecked ? `checked` : ``} ${isDisabled ? `disabled` : ``}
-            id="event-offer-${makeForAttribute(title)}" data-index-number="${index}" type="checkbox" name="event-offer-${makeForAttribute(title)}">
+            id="event-offer-${makeForAttribute(title)}" data-title="${title}" data-price="${price}" type="checkbox" name="event-offer-${makeForAttribute(title)}">
           <label class="event__offer-label" for="event-offer-${makeForAttribute(title)}">
             <span class="event__offer-title">${title}</span>
             &plus;
@@ -28,18 +34,25 @@ const createOffersTemplate = (offers, isDisabled) => {
     </section>`);
 };
 
+const createEventsListTemplate = (offersTypes, pointType) => offersTypes.map((type)=>(`
+  <div class="event__type-item">
+    <input id="event-type-${type}" class="event__type-input visually-hidden" type="radio"
+      name="event-type" value="${type}" ${pointType === type ? `checked` : ``}>
+    <label class="event__type-label event__type-label--${type}" for="event-type-${type}">${ucFirst(type)}</label>
+  </div>`
+)).join(``);
+
 const createPointEditTemplate = (
-    {waypoint, destination, price, isFavorite, time, isDisabled, isSaving, isDeleting},
+    {type, destination, offers, price, isFavorite, time, isDisabled, isSaving, isDeleting},
     isNewPoint = false,
-    destinations,
-    offers) => (
+    models) => (
   `${!isNewPoint ? `<li class="trip-events__item">`
     : ``}<form class="event event--edit ${isNewPoint ? `trip-events__item` : ``}" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${waypoint.icon}" alt="${waypoint.title}">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="${ucFirst(type)}">
           </label>
           <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? `disabled` : ``}>
 
@@ -47,24 +60,14 @@ const createPointEditTemplate = (
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Transfer</legend>
 
-              ${offers.filter(({type}) => !OFFERS_TYPE_WHERE_PLACE_IN.includes(type)).map(({type}) => (`
-                <div class="event__type-item">
-                  <input id="event-type-${type}-1" class="event__type-input visually-hidden" type="radio"
-                      name="event-type" value="${type}" ${waypoint.title.toLowerCase() === type ? `checked` : ``}>
-                  <label class="event__type-label event__type-label--${type}" for="event-type-${type}-1">${type.charAt(0).toUpperCase() + type.slice(1)}</label>
-                </div>`)).join(``)}
+              ${createEventsListTemplate(models.offers.getTypes().filter(({offerType}) => !OFFERS_TYPE_ACTIVITY.includes(offerType)), type)}
 
             </fieldset>
 
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Activity</legend>
 
-              ${offers.filter(({type}) => OFFERS_TYPE_WHERE_PLACE_IN.includes(type)).map(({type}) => (`
-                <div class="event__type-item">
-                  <input id="event-type-${type}-1" class="event__type-input visually-hidden" type="radio"
-                      name="event-type" value="${type}" ${waypoint.title.toLowerCase() === type ? `checked` : ``}>
-                  <label class="event__type-label event__type-label--${type}" for="event-type-${type}-1">${type.charAt(0).toUpperCase() + type.slice(1)}</label>
-                </div>`)).join(``)}
+              ${createEventsListTemplate(models.offers.getTypes().filter(({offerType}) => OFFERS_TYPE_ACTIVITY.includes(offerType)), type)}
 
             </fieldset>
           </div>
@@ -72,13 +75,13 @@ const createPointEditTemplate = (
 
         <div class="event__field-group event__field-group--destination">
           <label class="event__label event__type-output" for="event-destination-1">
-            ${waypoint.title} ${waypoint.place}
+            ${ucFirst(type)} ${OFFERS_TYPE_ACTIVITY.includes(type) ? `in` : `to`}
           </label>
           <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" list="destination-list-1"
-              data-value="${destination.name ? he.encode(destination.name) : ``}"
-              value="${destination.name ? he.encode(destination.name) : ``}" ${isDisabled ? `disabled` : ``}>
+            data-value="${destination.name ? he.encode(destination.name) : ``}"
+            value="${destination.name ? he.encode(destination.name) : ``}" ${isDisabled ? `disabled` : ``}>
           <datalist id="destination-list-1">
-            ${destinations.map(({name}) => `<option value="${name}"></option>`).join(``)}
+            ${models.destinations.getNames().map((name) => `<option value="${name}"></option>`).join(``)}
           </datalist>
         </div>
 
@@ -129,7 +132,7 @@ const createPointEditTemplate = (
 
       <section class="event__details">
 
-        ${createOffersTemplate(waypoint.offers, isDisabled)}
+        ${createOffersTemplate(offers, models.offers.getInfoByType(type), isDisabled)}
 
         ${destination.description || destination.pictures ? `
         <section class="event__section  event__section--destination">
@@ -155,19 +158,16 @@ const createPointEditTemplate = (
 );
 
 class PointEdit extends SmartView {
-  constructor({point, isNewPoint = false, destinations, offers}) {
+  constructor({point, isNewPoint = false, models}) {
     super();
 
-    // BLANK_POINT из констант сверху убрал, т.к. в него нужно подмешать данные из оферс
+    this._isNewPoint = isNewPoint;
+    this._models = models;
+
     if (!point) {
       point = {
-        waypoint: {
-          title: offers[0].type.charAt(0).toUpperCase() + offers[0].type.slice(1),
-          place: OFFERS_TYPE_WHERE_PLACE_IN.includes(offers[0].type) ? `in` : `to`,
-          icon: `${offers[0].type}.png`,
-          offers: offers[0].offers,
-          type: offers[0].type
-        },
+        type: this._models.offers.getOffers()[0].type,
+        offers: [],
         destination: {},
         price: ``,
         isFavorite: false,
@@ -179,9 +179,6 @@ class PointEdit extends SmartView {
     }
 
     this._data = PointEdit.parsePointToData(point);
-    this._isNewPoint = isNewPoint;
-    this._destinations = destinations;
-    this._offers = offers;
 
     this._datepicker = {
       start: null,
@@ -210,7 +207,7 @@ class PointEdit extends SmartView {
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._data, this._isNewPoint, this._destinations, this._offers);
+    return createPointEditTemplate(this._data, this._isNewPoint, this._models);
   }
 
   // Перегружаем метод родителя removeElement,
@@ -303,18 +300,14 @@ class PointEdit extends SmartView {
   }
 
   _priceInputKeydownHandler(evt) {
-    // Если сразу видно, что нажатые кнопки нам подходят, то сразу разрешаем, поэтому "return"
-    if ([KeyCode.DELETE, KeyCode.BACKSPACE, KeyCode.TAB, KeyCode.ESCAPE, KeyCode.ENTER].includes(evt.keyCode) ||
-      (evt.keyCode === KeyCode.A && evt.ctrlKey) ||
-      (evt.keyCode === KeyCode.C && evt.ctrlKey) ||
-      (evt.keyCode === KeyCode.X && evt.ctrlKey) ||
+    // TODO: вот не знаю как это отрефакторить(( не могу придумать имя функции is?????
+    if (Object.values(KeyCode.FIST_GROUP).includes(evt.keyCode) ||
+      Object.values(KeyCode.SECOND_GROUP).includes(evt.keyCode) && evt.ctrlKey ||
       (evt.keyCode >= KeyCode.END && evt.keyCode <= KeyCode.RIGHT_ARROW)) {
       return;
     }
-    // если дошли сюда, значит не все однозначно, нужно дальше проверять
 
-    // если по условию мы попадаем, значит нажатая кнопка нам не подходит и мы делаем evt.preventDefault();
-    if ((evt.shiftKey || (evt.keyCode < KeyCode[`0`] || evt.keyCode > KeyCode[`9`])) && (evt.keyCode < KeyCode.NUMPAD_0 || evt.keyCode > KeyCode.NUMPAD_9)) {
+    if ((evt.shiftKey || (evt.keyCode < KeyCode.SUB_ZERO || evt.keyCode > KeyCode.SUB_NINE)) && (evt.keyCode < KeyCode.NUM_ZERO || evt.keyCode > KeyCode.NUM_NINE)) {
       evt.preventDefault();
     }
   }
@@ -336,8 +329,14 @@ class PointEdit extends SmartView {
     }
 
     offersBlock.addEventListener(`change`, (evt) => {
-      const index = evt.target.dataset.indexNumber;
-      this._data.waypoint.offers[index].isChecked = evt.target.checked;
+      const title = evt.target.dataset.title;
+      const price = Number(evt.target.dataset.price);
+
+      if (evt.target.checked) {
+        this._data.offers.push({title, price});
+      } else {
+        this._data.offers = this._data.offers.filter(({title: titleOffer}) => titleOffer !== title);
+      }
     });
   }
 
@@ -349,7 +348,7 @@ class PointEdit extends SmartView {
       evt.target.value = value;
     }
 
-    const find = this._destinations.find(({name}) => name.indexOf(value) === 0);
+    const find = this._models.destinations.getNames().find((name) => name.indexOf(value) === 0);
 
     if (find) {
       evt.target.dataset.value = evt.target.value;
@@ -360,9 +359,7 @@ class PointEdit extends SmartView {
 
   _destinationInputChangeHandler(evt) {
     evt.preventDefault();
-    const value = evt.target.value;
-    const destination = this._destinations.find(({name}) => name === value) || {title: value};
-
+    const destination = this._models.destinations.getInfoByName(evt.target.value);
     this.updateData({destination});
   }
 
@@ -376,39 +373,50 @@ class PointEdit extends SmartView {
       return;
     }
 
-    if (this._data.waypoint.title.toLowerCase() === target.value) {
+    const type = target.value;
+    if (this._data.type === type) {
       // Закрытие всплывайки нужно только, если пользователь кликнет на тот же тип маршрута, что уже выбран.
       // иначе, при клике на другой тип маршрута, вся карточка будет обновлена и закрывать всплывайку смысла нету
       this.getElement().querySelector(`#event-type-toggle-1`).checked = false;
       return;
     }
 
-    const newWaypoint = cloneDeep(this._offers.find(({type}) => type === target.value));
-    newWaypoint.offers = newWaypoint.offers.map((offer)=>{
-      offer.isChecked = false;
-      return offer;
-    });
-    newWaypoint.title = newWaypoint.type.charAt(0).toUpperCase() + newWaypoint.type.slice(1);
-    newWaypoint.place = OFFERS_TYPE_WHERE_PLACE_IN.includes(newWaypoint.type) ? `in` : `to`;
-    newWaypoint.icon = `${newWaypoint.type}.png`;
+    // + очистим список выбранных offers: []
+    this.updateData({type, offers: []});
+  }
 
-    this.updateData({waypoint: newWaypoint});
+  _formValidate() {
+    const destinationElement = this.getElement().querySelector(`.event__input--destination`);
+    const priceElement = this.getElement().querySelector(`.event__input--price`);
+
+    if (!destinationElement.value) {
+      destinationElement.focus();
+      this.shake();
+      return false;
+    }
+
+    // Тут, из-за приведения типов пользователь может ввести "0", который преобразуется в false, но мне это даже
+    // наруку, т.к. стоимось не может быть нулем
+    if (!priceElement.value) {
+      priceElement.focus();
+      this.shake();
+      return false;
+    }
+
+    return true;
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
 
-    if (!this._data.price || !this._data.destination.name) {
-      alert(`Please fill in all required fields! price and description`); // eslint-disable-line no-alert
-      return;
+    if (this._formValidate()) {
+      this._callback.formSubmit(PointEdit.parseDataToPoint(this._data));
     }
-
-    this._callback.formSubmit(PointEdit.parseDataToPoint(this._data));
   }
 
   _formDeleteClickHandler(evt) {
     evt.preventDefault();
-    this._callback.deleteClick(PointEdit.parseDataToPoint(this._data));
+    this._callback.deleteClick({id: this._data.id});
   }
 
   _formCloseHandler(evt) {

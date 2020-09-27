@@ -7,8 +7,8 @@ import {TimeInMilliseconds} from '../const';
 const renderMoneyChart = (moneyCtx, points) => {
   // получим объект вида, где ключи будут type, а значением сумма цены
   points = points.reduce((prev, current) => {
-    prev[current.waypoint.type] = prev[current.waypoint.type] ?
-      prev[current.waypoint.type] + current.price : current.price;
+    prev[current.type] = prev[current.type] ?
+      prev[current.type] + current.price : current.price;
     return prev;
   }, {});
 
@@ -84,8 +84,8 @@ const renderMoneyChart = (moneyCtx, points) => {
 const renderTransportChart = (transportCtx, points) => {
   // получим объект вида, где ключи будут type, а значением количество его повторений
   points = points.reduce((prev, current) => {
-    prev[current.waypoint.type] = prev[current.waypoint.type] ?
-      prev[current.waypoint.type] + 1 : 1;
+    prev[current.type] = prev[current.type] ?
+      prev[current.type] + 1 : 1;
     return prev;
   }, {});
 
@@ -162,8 +162,8 @@ const renderTimeSpendChart = (timeSpendCtx, points) => {
   // получим объект вида, где ключи будут type, а значением длительность в миллисекундах для данного типа
   points = points.reduce((prev, current) => {
     const durationPoint = current.time.end - current.time.start;
-    prev[current.waypoint.type] = prev[current.waypoint.type] ?
-      prev[current.waypoint.type] + durationPoint : durationPoint;
+    prev[current.type] = prev[current.type] ?
+      prev[current.type] + durationPoint : durationPoint;
     return prev;
   }, {});
 

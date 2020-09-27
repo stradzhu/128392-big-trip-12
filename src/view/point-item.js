@@ -1,5 +1,6 @@
-import {TimeInMilliseconds} from '../const';
+import {TimeInMilliseconds, OFFERS_TYPE_ACTIVITY} from '../const';
 import {createTwoDigitNumber, createHumanTime} from '../utils/render';
+import {ucFirst} from '../utils/common';
 import AbstractView from './abstract';
 import he from 'he';
 
@@ -10,7 +11,7 @@ const createOffersTemplate = (offers) => {
 
   return (`<h4 class="visually-hidden">Offers:</h4>
   <ul class="event__selected-offers">
-    ${offers.filter(({isChecked})=>isChecked).map(({title, price}, index)=>(
+    ${offers.map(({title, price}, index)=>(
       `${index < 3 ? `<li class="event__offer">
         <span class="event__offer-title">${title}</span>
         &plus;
@@ -49,13 +50,13 @@ const createTimeTemplate = ({start, end}) => {
   );
 };
 
-const createPointItemTemplate = ({waypoint, destination, price, time}) => (
+const createPointItemTemplate = ({type, offers, destination, price, time}) => (
   `<li class="trip-events__item">
     <div class="event">
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/${waypoint.icon}" alt="${waypoint.title}">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="${ucFirst(type)}">
       </div>
-      <h3 class="event__title">${waypoint.title} ${waypoint.place} ${destination.name ? he.encode(destination.name) : ``}</h3>
+      <h3 class="event__title">${ucFirst(type)} ${OFFERS_TYPE_ACTIVITY.includes(type) ? `in` : `to`} ${destination.name ? he.encode(destination.name) : ``}</h3>
 
       <div class="event__schedule">
         ${createTimeTemplate(time)}
@@ -65,7 +66,7 @@ const createPointItemTemplate = ({waypoint, destination, price, time}) => (
         &euro;&nbsp;<span class="event__price-value">${price}</span>
       </p>
 
-      ${createOffersTemplate(waypoint.offers)}
+      ${createOffersTemplate(offers)}
 
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>

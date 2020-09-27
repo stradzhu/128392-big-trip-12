@@ -16,13 +16,12 @@ export const State = {
 };
 
 class Point {
-  constructor(listElement, changeData, changeMode, getSortType, destinations, offers) {
+  constructor(listElement, changeData, changeMode, getSortType, models) {
     this._listElement = listElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._getSortType = getSortType;
-    this._destinations = destinations;
-    this._offers = offers;
+    this._models = models;
 
     this._itemComponent = null;
     this._editComponent = null;
@@ -41,14 +40,17 @@ class Point {
   init(point, updateFavorite) {
     this._point = point;
 
+    if (updateFavorite) {
+      return;
+    }
+
     const prevItemComponent = this._itemComponent;
     const prevEditComponent = this._editComponent;
 
     this._itemComponent = new PointItemView(this._point);
     this._editComponent = new PointEditView({
       point: this._point,
-      destinations: this._destinations, // destinations и offers нужны внутри
-      offers: this._offers,
+      models: this._models
     });
 
     this._itemComponent.setEditClickHandler(this._handle.editClick);
@@ -67,13 +69,8 @@ class Point {
     }
 
     if (this._mode === Mode.EDITING) {
-      // чтобы клик по "избранное" не закрывал форму
-      if (updateFavorite) {
-        replace(this._editComponent, prevEditComponent);
-      } else {
-        replace(this._itemComponent, prevEditComponent);
-        this._mode = Mode.DEFAULT;
-      }
+      replace(this._itemComponent, prevEditComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     remove(prevItemComponent);
@@ -198,7 +195,7 @@ class Point {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.keyCode === KeyCode.ESCAPE) {
+    if (evt.keyCode === KeyCode.FIST_GROUP.ESCAPE) {
       evt.preventDefault();
       this._handle.formClose();
     }
