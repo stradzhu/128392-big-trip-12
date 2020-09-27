@@ -241,13 +241,11 @@ class Trip {
   _clearAllDays({resetSortType = false} = {}) {
     this._pointNewPresenter.destroy();
 
-    // очищаем все point (они хранятся внутри дней)
     Object
       .values(this._pointPresenter)
       .forEach((presenter) => presenter.destroy());
     this._pointPresenter = {};
 
-    // очищаем список дней
     Object
       .values(this._dayComponent)
       .forEach((component) => remove(component));
@@ -279,14 +277,12 @@ class Trip {
         this._renderDefaultSortPoints(filtredPoints);
         break;
       default:
-        // т.к. данные уже отсортированы в нужном порядке (по time или price), то нам стоит только их отправить на рендер
         this._renderDay(filtredPoints);
     }
   }
 
   _renderDefaultSortPoints(points) {
     points.map((point) => {
-      // добавим свойство startDay для более удобного деления по дням и отсортируем массив по времени начала
       point.time.startDay = new Date(+point.time.start).setHours(0, 0, 0, 0);
       return point;
     });

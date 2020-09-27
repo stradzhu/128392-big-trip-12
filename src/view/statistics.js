@@ -5,14 +5,12 @@ import {TimeInMilliseconds} from '../const';
 
 
 const renderMoneyChart = (moneyCtx, points) => {
-  // получим объект вида, где ключи будут type, а значением сумма цены
   points = points.reduce((prev, current) => {
     prev[current.type] = prev[current.type] ?
       prev[current.type] + current.price : current.price;
     return prev;
   }, {});
 
-  // преобразуем его в массив массивов и отсортируем по убыванию цены
   points = Object.entries(points).sort((a, b) => b[1] - a[1]);
 
   return new Chart(moneyCtx, {
@@ -82,14 +80,12 @@ const renderMoneyChart = (moneyCtx, points) => {
 };
 
 const renderTransportChart = (transportCtx, points) => {
-  // получим объект вида, где ключи будут type, а значением количество его повторений
   points = points.reduce((prev, current) => {
     prev[current.type] = prev[current.type] ?
       prev[current.type] + 1 : 1;
     return prev;
   }, {});
 
-  // преобразуем его в массив массивов и отсортируем по убыванию количества повторений
   points = Object.entries(points).sort((a, b) => b[1] - a[1]);
 
   return new Chart(transportCtx, {
@@ -159,7 +155,6 @@ const renderTransportChart = (transportCtx, points) => {
 };
 
 const renderTimeSpendChart = (timeSpendCtx, points) => {
-  // получим объект вида, где ключи будут type, а значением длительность в миллисекундах для данного типа
   points = points.reduce((prev, current) => {
     const durationPoint = current.time.end - current.time.start;
     prev[current.type] = prev[current.type] ?
@@ -167,7 +162,6 @@ const renderTimeSpendChart = (timeSpendCtx, points) => {
     return prev;
   }, {});
 
-  // преобразуем его в массив массивов и отсортируем по убыванию миллисекунд
   points = Object.entries(points).sort((a, b) => b[1] - a[1]);
 
   return new Chart(timeSpendCtx, {

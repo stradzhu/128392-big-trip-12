@@ -42,7 +42,6 @@ const createTripInfoMainTemplate = (points) => (
 class TripInfoMain extends AbstractView {
   constructor(points) {
     super();
-    // сортируем от меньшего к большего по значению "time start"
     this._points = points.sort(({time: {start: a}}, {time: {start: b}}) => a - b);
   }
 

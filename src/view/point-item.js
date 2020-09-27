@@ -25,18 +25,26 @@ const createTimeTemplate = ({start, end}) => {
   let timeDiff = end - start;
   let humanTimeDiff = ``;
 
-  let levelConvertDate = Boolean(Math.trunc(timeDiff / TimeInMilliseconds.DAY))
+  const levelConvertDate = Boolean(Math.trunc(timeDiff / TimeInMilliseconds.DAY))
     + Boolean(Math.trunc(timeDiff / TimeInMilliseconds.HOUR)) + 1;
 
-  // TODO: добавить break или переписать код без switch
   switch (levelConvertDate) {
     case 3:
       humanTimeDiff = createTwoDigitNumber(Math.trunc(timeDiff / TimeInMilliseconds.DAY)) + `D `;
       timeDiff = timeDiff % TimeInMilliseconds.DAY;
-    case 2: // eslint-disable-line no-fallthrough
+
       humanTimeDiff += createTwoDigitNumber(Math.trunc(timeDiff / TimeInMilliseconds.HOUR)) + `H `;
       timeDiff = timeDiff % TimeInMilliseconds.HOUR;
-    case 1: // eslint-disable-line no-fallthrough
+
+      humanTimeDiff += createTwoDigitNumber(Math.trunc(timeDiff / TimeInMilliseconds.MINUTE)) + `M`;
+      break;
+    case 2:
+      humanTimeDiff += createTwoDigitNumber(Math.trunc(timeDiff / TimeInMilliseconds.HOUR)) + `H `;
+      timeDiff = timeDiff % TimeInMilliseconds.HOUR;
+
+      humanTimeDiff += createTwoDigitNumber(Math.trunc(timeDiff / TimeInMilliseconds.MINUTE)) + `M`;
+      break;
+    default:
       humanTimeDiff += createTwoDigitNumber(Math.trunc(timeDiff / TimeInMilliseconds.MINUTE)) + `M`;
   }
 

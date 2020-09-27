@@ -61,15 +61,10 @@ class Points extends Observer {
         {},
         point,
         {
-          // поле id сошлось с севером
-          // поле destination сошлось с севером
-          // поле offers сошлось с сервером
-          // поле type сошлось с сервером
           price: point.base_price,
           time: {
             start: new Date(point.date_from),
             end: new Date(point.date_to),
-            // добавим свойство startDay для более удобного деления точек по дням
             startDay: new Date(point.date_from).setHours(0, 0, 0, 0),
           },
           isFavorite: point.is_favorite,

@@ -14,8 +14,6 @@ class Offers {
   }
 
   getInfoByType(type) {
-    // Метод find возращает undefined, если ничего не найдено, а мне удобное получить пустой объект
-    // в модели destinations эта проверка явно нужна, а тут больше для подстраховки и единообразия кода
     const info = this._offers.find((offer) => offer.type === type).offers;
     return info ? cloneDeep(info) : {};
   }
