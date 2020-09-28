@@ -21,21 +21,6 @@ class SwitchTrip extends AbstractView {
     return createSwitchMenuTemplate();
   }
 
-  _menuClickHandler(evt) {
-    const target = evt.target;
-    const link = target.dataset.link;
-    if (!link) {
-      return;
-    }
-    evt.preventDefault();
-
-    if (target.classList.contains(ACTIVE_CLASS)) {
-      return;
-    }
-
-    this._callback.menuClick(link);
-  }
-
   setMenuClickHandler(callback) {
     this._callback.menuClick = callback;
     this.getElement().addEventListener(`click`, this._menuClickHandler);
@@ -51,6 +36,21 @@ class SwitchTrip extends AbstractView {
     if (currentActive !== null) {
       currentActive.classList.add(ACTIVE_CLASS);
     }
+  }
+
+  _menuClickHandler(evt) {
+    const target = evt.target;
+    const link = target.dataset.link;
+    if (!link) {
+      return;
+    }
+    evt.preventDefault();
+
+    if (target.classList.contains(ACTIVE_CLASS)) {
+      return;
+    }
+
+    this._callback.menuClick(link);
   }
 }
 

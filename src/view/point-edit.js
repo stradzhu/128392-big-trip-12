@@ -239,6 +239,38 @@ class PointEdit extends SmartView {
     this.setFormCloseHandler(this._callback.formClose);
   }
 
+  setFavoriteClickHandler(callback) {
+    if (this._isNewPoint) {
+      return;
+    }
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector(`input[name="event-favorite"]`).addEventListener(`click`, this._handler.favoriteClick);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+
+    if (this._isNewPoint) {
+      this.getElement().addEventListener(`submit`, this._handler.formSubmit);
+    } else {
+      this.getElement().querySelector(`form`).addEventListener(`submit`, this._handler.formSubmit);
+    }
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._handler.formDeleteClick);
+  }
+
+  setFormCloseHandler(callback) {
+    if (this._isNewPoint) {
+      return;
+    }
+
+    this._callback.formClose = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handler.formClose);
+  }
+
   _setDatepickerStart() {
     if (this._datepicker.start) {
       this._datepicker.start.destroy();
@@ -422,38 +454,6 @@ class PointEdit extends SmartView {
     this.getElement().querySelector(`.event__input--price`).addEventListener(`keydown`, this._handler.priceInputKeydown);
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._handler.destinationInputChange);
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`input`, this._handler.destinationInputInput);
-  }
-
-  setFavoriteClickHandler(callback) {
-    if (this._isNewPoint) {
-      return;
-    }
-    this._callback.favoriteClick = callback;
-    this.getElement().querySelector(`input[name="event-favorite"]`).addEventListener(`click`, this._handler.favoriteClick);
-  }
-
-  setFormSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
-
-    if (this._isNewPoint) {
-      this.getElement().addEventListener(`submit`, this._handler.formSubmit);
-    } else {
-      this.getElement().querySelector(`form`).addEventListener(`submit`, this._handler.formSubmit);
-    }
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._handler.formDeleteClick);
-  }
-
-  setFormCloseHandler(callback) {
-    if (this._isNewPoint) {
-      return;
-    }
-
-    this._callback.formClose = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handler.formClose);
   }
 
   static parsePointToData(point) {
