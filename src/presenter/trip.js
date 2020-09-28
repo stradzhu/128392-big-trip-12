@@ -32,6 +32,7 @@ class Trip {
     this._dayComponent = {};
 
     this._isLoading = true;
+    this._isInited = false;
 
     this._sortComponent = new SortView();
     this._infoComponent = new TripInfoView();
@@ -41,6 +42,7 @@ class Trip {
     this._statisticsComponent = null;
     this._daysComponent = new TripDaysView();
     this._loadingComponent = new LoadingView();
+    this._noPointComponent = new NoPointView();
 
     this._addPointComponent = new AddPointView(this._mainElement);
     this._addPointComponent.disabled = false;
@@ -71,6 +73,8 @@ class Trip {
 
     this._renderSort();
     this._renderPoints();
+
+    this._isInited = true;
   }
 
   destroy() {
@@ -81,6 +85,8 @@ class Trip {
 
     this._models.points.removeObserver(this._handle.modelEvent);
     this._models.filter.removeObserver(this._handle.modelEvent);
+
+    this._isInited = false;
   }
 
   createPoint() {
@@ -88,7 +94,9 @@ class Trip {
     this._models.filter.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._addPointComponent.disabled = true;
 
-    this.init();
+    if (!this._isInited) {
+      this.init();
+    }
     remove(this._statisticsComponent);
     this._switchTripComponent.setMenuItem(MenuItem.TABLE);
 
@@ -268,6 +276,8 @@ class Trip {
     if (!points.length) {
       this._renderNoPoint();
       return;
+    } else {
+      remove(this._noPointComponent);
     }
 
     const filtredPoints = filter[this._models.filter.getFilter()](points);
@@ -318,7 +328,8 @@ class Trip {
   }
 
   _renderNoPoint() {
-    render(this._containerElement, new NoPointView());
+    remove(this._noPointComponent);
+    render(this._containerElement, this._noPointComponent);
   }
 
   _renderLoading() {

@@ -111,9 +111,14 @@ const createPointEditTemplate = (
         <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>
           ${isSaving ? `Saving...` : `Save`}
         </button>
+
+        ${isNewPoint ? `
+        <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>
+          ${isDeleting ? `Canceling...` : `Cancel`}
+        </button>` : `
         <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>
           ${isDeleting ? `Deleting...` : `Delete`}
-        </button>
+        </button>`}
 
         ${!isNewPoint ? `
         <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden" type="checkbox"

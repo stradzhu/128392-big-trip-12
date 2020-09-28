@@ -22,7 +22,9 @@ const renderMoneyChart = (moneyCtx, points) => {
         data: points.map((item) => item[1]),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
+        anchor: `start`,
+        barThickness: 44,
+        minBarLength: 50,
       }]
     },
     options: {
@@ -54,8 +56,7 @@ const renderMoneyChart = (moneyCtx, points) => {
           gridLines: {
             display: false,
             drawBorder: false
-          },
-          barThickness: 44,
+          }
         }],
         xAxes: [{
           ticks: {
@@ -65,8 +66,7 @@ const renderMoneyChart = (moneyCtx, points) => {
           gridLines: {
             display: false,
             drawBorder: false
-          },
-          minBarLength: 50
+          }
         }],
       },
       legend: {
@@ -97,7 +97,9 @@ const renderTransportChart = (transportCtx, points) => {
         data: points.map((item) => item[1]),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
+        anchor: `start`,
+        barThickness: 44,
+        minBarLength: 50,
       }]
     },
     options: {
@@ -129,8 +131,7 @@ const renderTransportChart = (transportCtx, points) => {
           gridLines: {
             display: false,
             drawBorder: false
-          },
-          barThickness: 44,
+          }
         }],
         xAxes: [{
           ticks: {
@@ -140,8 +141,7 @@ const renderTransportChart = (transportCtx, points) => {
           gridLines: {
             display: false,
             drawBorder: false
-          },
-          minBarLength: 50
+          }
         }],
       },
       legend: {
@@ -173,7 +173,9 @@ const renderTimeSpendChart = (timeSpendCtx, points) => {
         data: points.map((item) => Math.round(item[1] / TimeInMilliseconds.HOUR)),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
+        anchor: `start`,
+        barThickness: 44,
+        minBarLength: 50,
       }]
     },
     options: {
@@ -205,8 +207,7 @@ const renderTimeSpendChart = (timeSpendCtx, points) => {
           gridLines: {
             display: false,
             drawBorder: false
-          },
-          barThickness: 44,
+          }
         }],
         xAxes: [{
           ticks: {
@@ -216,8 +217,7 @@ const renderTimeSpendChart = (timeSpendCtx, points) => {
           gridLines: {
             display: false,
             drawBorder: false
-          },
-          minBarLength: 50
+          }
         }],
       },
       legend: {
