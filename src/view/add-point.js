@@ -4,12 +4,12 @@ class AddPoint {
     this._mainElement = mainElement;
   }
 
-  _getElement() {
-    return this._mainElement.querySelector(this._selector);
-  }
-
   set disabled(state) {
     this._getElement().disabled = state;
+  }
+
+  _getElement() {
+    return this._mainElement.querySelector(this._selector);
   }
 }
 
