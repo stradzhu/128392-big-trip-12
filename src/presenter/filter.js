@@ -23,8 +23,7 @@ class Filter {
 
     const prevFilterComponent = this._filterComponent;
 
-    let filters = this._getFilters();
-    filters = filters.map(({type, count}) => {
+    const filters = this._getFilters().map(({type, count}) => {
       return {
         type,
         isChecked: count ? type === this._currentFilter : false,

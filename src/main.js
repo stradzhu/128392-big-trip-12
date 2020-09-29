@@ -9,7 +9,7 @@ import Api from './api/api';
 import Store from './api/store';
 import Provider from './api/provider';
 
-const AUTHORIZATION = `Basic HTML_Academy_the_best-2020`;
+const AUTHORIZATION = `Basic HTML_Academy_the_best-abcd`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 
 const STORE_PREFIX = `bigtrip-localstorage-2020`;
