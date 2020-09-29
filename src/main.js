@@ -1,4 +1,4 @@
-import {UpdateType} from './const';
+import {FilterType, UpdateType} from './const';
 import TripPresenter from './presenter/trip';
 import FilterPresenter from './presenter/filter';
 import PointsModel from './model/points';
@@ -9,10 +9,10 @@ import Api from './api/api';
 import Store from './api/store';
 import Provider from './api/provider';
 
-const AUTHORIZATION = `Basic HTML_Academy_the_best`;
+const AUTHORIZATION = `Basic HTML_Academy_the_best-abcd`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip`;
 
-const STORE_PREFIX = `bigtrip-localstorage`;
+const STORE_PREFIX = `bigtrip-localstorage-2020`;
 const STORE_VER = `v12`;
 const STORE_NAME_POINTS = `${STORE_PREFIX}-points-${STORE_VER}`;
 const STORE_NAME_OFFERS = `${STORE_PREFIX}-offers-${STORE_VER}`;
@@ -41,6 +41,10 @@ const sortElement = containerElement.querySelector(`:scope > h2:first-child`);
 
 Promise.all([apiWithProvider.getDestinations(), apiWithProvider.getOffers(), apiWithProvider.getPoints()])
   .then(([destinations, offers, points]) => {
+
+    if (points.length) {
+      models.filter.setFilter(UpdateType.INIT, FilterType.EVERYTHING);
+    }
 
     const tripPresenter = new TripPresenter({
       containerElement,

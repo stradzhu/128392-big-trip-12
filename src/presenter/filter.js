@@ -1,5 +1,6 @@
 import FilterView from '../view/filter';
 import {render, replace, remove} from '../utils/render';
+import {filter} from '../utils/filter';
 import {FilterType, PlaceTemplate, UpdateType} from '../const';
 
 class Filter {
@@ -22,7 +23,15 @@ class Filter {
 
     const prevFilterComponent = this._filterComponent;
 
-    this._filterComponent = new FilterView(FilterType, this._currentFilter);
+    const filters = this._getFilters().map(({type, count}) => {
+      return {
+        type,
+        isChecked: count ? type === this._currentFilter : false,
+        isDisabled: !count
+      };
+    });
+
+    this._filterComponent = new FilterView(filters);
     this._filterComponent.setFilterTypeChangeHandler(this._handle.filterTypeChange);
 
     if (!prevFilterComponent) {
@@ -32,6 +41,11 @@ class Filter {
 
     replace(this._filterComponent, prevFilterComponent);
     remove(prevFilterComponent);
+  }
+
+  _getFilters() {
+    const points = this._pointsModel.getPoints();
+    return Object.values(FilterType).map((type) => ({type, count: filter[type](points).length}));
   }
 
   _handleModelEvent() {

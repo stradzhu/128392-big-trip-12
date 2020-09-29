@@ -111,9 +111,14 @@ const createPointEditTemplate = (
         <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>
           ${isSaving ? `Saving...` : `Save`}
         </button>
+
+        ${isNewPoint ? `
+        <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>
+          ${isDeleting ? `Canceling...` : `Cancel`}
+        </button>` : `
         <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>
           ${isDeleting ? `Deleting...` : `Delete`}
-        </button>
+        </button>`}
 
         ${!isNewPoint ? `
         <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden" type="checkbox"
@@ -237,6 +242,38 @@ class PointEdit extends SmartView {
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
     this.setFormCloseHandler(this._callback.formClose);
+  }
+
+  setFavoriteClickHandler(callback) {
+    if (this._isNewPoint) {
+      return;
+    }
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector(`input[name="event-favorite"]`).addEventListener(`click`, this._handler.favoriteClick);
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+
+    if (this._isNewPoint) {
+      this.getElement().addEventListener(`submit`, this._handler.formSubmit);
+    } else {
+      this.getElement().querySelector(`form`).addEventListener(`submit`, this._handler.formSubmit);
+    }
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._handler.formDeleteClick);
+  }
+
+  setFormCloseHandler(callback) {
+    if (this._isNewPoint) {
+      return;
+    }
+
+    this._callback.formClose = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handler.formClose);
   }
 
   _setDatepickerStart() {
@@ -422,38 +459,6 @@ class PointEdit extends SmartView {
     this.getElement().querySelector(`.event__input--price`).addEventListener(`keydown`, this._handler.priceInputKeydown);
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._handler.destinationInputChange);
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`input`, this._handler.destinationInputInput);
-  }
-
-  setFavoriteClickHandler(callback) {
-    if (this._isNewPoint) {
-      return;
-    }
-    this._callback.favoriteClick = callback;
-    this.getElement().querySelector(`input[name="event-favorite"]`).addEventListener(`click`, this._handler.favoriteClick);
-  }
-
-  setFormSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
-
-    if (this._isNewPoint) {
-      this.getElement().addEventListener(`submit`, this._handler.formSubmit);
-    } else {
-      this.getElement().querySelector(`form`).addEventListener(`submit`, this._handler.formSubmit);
-    }
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._handler.formDeleteClick);
-  }
-
-  setFormCloseHandler(callback) {
-    if (this._isNewPoint) {
-      return;
-    }
-
-    this._callback.formClose = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._handler.formClose);
   }
 
   static parsePointToData(point) {

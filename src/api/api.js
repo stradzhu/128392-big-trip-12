@@ -25,7 +25,6 @@ class Api {
       return Promise.resolve(this._destinations);
     } else {
       return this._load({url: `destinations`})
-        .then(Api.toJSON)
         .then((destinations) => {
           this._destinations = destinations;
           return destinations;
@@ -38,7 +37,6 @@ class Api {
       return Promise.resolve(this._offers);
     } else {
       return this._load({url: `offers`})
-        .then(Api.toJSON)
         .then((offers) => {
           this._offers = offers;
           return offers;
@@ -48,7 +46,6 @@ class Api {
 
   getPoints() {
     return this._load({url: `points`})
-      .then(Api.toJSON)
       .then((points) => points.map(PointsModel.adaptToClient));
   }
 
@@ -59,7 +56,6 @@ class Api {
       body: JSON.stringify(PointsModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(Api.toJSON)
       .then(PointsModel.adaptToClient);
   }
 
@@ -70,7 +66,6 @@ class Api {
       body: JSON.stringify(PointsModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(Api.toJSON)
       .then(PointsModel.adaptToClient);
   }
 
@@ -87,8 +82,7 @@ class Api {
       method: Method.POST,
       body: JSON.stringify(data),
       headers: new Headers({"Content-Type": `application/json`})
-    })
-      .then(Api.toJSON);
+    });
   }
 
   _load({
@@ -101,6 +95,7 @@ class Api {
 
     return fetch(`${this._endPoint}/${url}`, {method, body, headers})
       .then(Api.checkStatus)
+      .then(Api.toJSON)
       .catch(Api.catchError);
   }
 
@@ -113,7 +108,10 @@ class Api {
   }
 
   static toJSON(response) {
-    return response.json();
+    if (response.headers.get(`Content-Type`).includes(`application/json`)) {
+      return response.json();
+    }
+    return response;
   }
 
   static catchError(err) {
